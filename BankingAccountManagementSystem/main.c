@@ -2,50 +2,116 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-
-#define KNRM  "\x1B[0m"
-#define KRED  "\x1B[31m"
-#define KGRN  "\x1B[32m"
-#define KYEL  "\x1B[33m"
-#define KBLU  "\x1B[34m"
-#define KMAG  "\x1B[35m"
-#define KCYN  "\x1B[36m"
-#define KWHT  "\x1B[37m"
-
-//printf("%sred\n", KRED);
-//printf("%sgreen\n", KGRN);
-//printf("%syellow\n", KYEL);
-//printf("%sblue\n", KBLU);
-//printf("%smagenta\n", KMAG);
-//printf("%scyan\n", KCYN);
-//printf("%swhite\n", KWHT);
-//printf("%snormal\n", KNRM);
+#include "tools.h"
 
 
-void CloseApp()
+#define DEFAULT_KONTO_NUMMER 1337000
+
+// Dateizeiger erstellen
+FILE* fileStream;
+
+typedef enum
 {
-	printf(KNRM"\n\n\t\tVielen Dank für Ihren Besuch\n\n");
+	Deposit,
+	Withdraw
+}TransactionType;
+
+typedef struct
+{
+	TransactionType type;
+	char* DateTime;
+	int Value;
+}Transaction;
+
+typedef struct
+{
+	char* FirstName;
+	char* LastName;
+	char* BirthDate;
+	char* Adress;
+	int AccountNumber;
+	char* LastLogin;
+	struct Transaction* Transaction;
+	int Transactions;
+	struct BankAccount* prev;
+	struct BankAccount* next;
+}BankAccount;
+
+BankAccount* BankAccounts = NULL;
+
+void CloseApp(void)
+{
+	printf(GRN"\n\n\t\tVielen Dank für Ihren Besuch"RESET"\n\n");
 	fflush(stdout);
 	for (int i = 5; i != 0; i--)
 	{
-		printf(KBLU"\r\t\tSie werden in     %d     Sekunden automatisch ausgeloggt.", i);
+		printf(WHT"\r\t\tSie werden in     "MAG" %d"RESET"     Sekunden automatisch ausgeloggt.", i);
 		fflush(stdout);
 		Sleep(1000);
 	}
 
 	system("cls");
-	printf(KNRM"");
 	return 1;
+}
+
+void CreateNewAccount(void)
+{
+	BankAccount* bankAccount = malloc(sizeof(BankAccount));
+
+	printf("Bitte geben Sie Ihren Vornamen ein");
+	scanf("%s", bankAccount->FirstName);
+	system("cls");
+
+	printf("Bitte geben Sie Ihren Nachnamen ein");
+	scanf("%s", bankAccount->LastName);
+	system("cls");
+
+	printf("Bitte geben Ihren Geburtsdatum in folgendem Format ein: DD.MM.YYYY z.B. 01.03.1972");
+	scanf("%s", bankAccount->BirthDate);
+	system("cls");
+
+
+	if (BankAccounts[0] == NULL)
+	{
+
+	}
+
+	for (int i = 0; i < sizeof(BankAccounts) / sizeof(BankAccounts[0]); i++)
+	{
+
+	}
+
+	// Kontonummer ermitteln
+	// Get Latests KontoNummer von allen gefundenen Konten
+	// Öffne Datei und liefere letzte Kontonummer --> Zähle 1 hoch und verwende diese als neue Konto Nummer
+
+		// Datei oeffnen
+	fileStream = fopen("accounts.txt", "r");
+
+	if (fileStream == NULL) {
+		// File konnte nicht geöffnet werden
+	}
+	else {
+		// Save new Account to file
+
+	}
+
+
+
+
+	printf("Herzlichen Glückwunsch. Konto wurde erfolgreich eröffnet");
+
+
 }
 
 
 int OpenStartMenu()
 {
 	int choice;
-	printf(KGRN"\n\n\t\t\t Willkommen in Ihrer Bank-Verwaltung \n\n\n");
+	printf(GRN"\n\n\t\t\t Willkommen in Ihrer Bank-Verwaltung \n\n\n" RESET);
 	while (1)
 	{
-		printf(KNRM"\t 1.) Login\n");
+		printf("\t 1.) Login\n");
 		printf("\t 2.) New Account\n");
 		printf("\t 3.) Close Application\n");
 
@@ -59,7 +125,7 @@ int OpenStartMenu()
 			//new_acc();
 			break;
 		case 2:
-			//edit();
+			CreateNewAccount();
 			break;
 		case 3:
 			//transact();
@@ -83,8 +149,47 @@ int OpenStartMenu()
 	}
 }
 
+void LoadBankAccounts()
+{
+	int c;
+	// Datei oeffnen
+	fileStream = fopen("accounts.txt", "r");
 
+	char* buffer = calloc(1024, sizeof(char));
 
+	while (fscanf(fileStream, "%s", buffer) == 1) // expect 1 successful conversion
+	{
+		// process buffer
+	}
+	if (feof(fileStream))
+	{
+		// hit end of file
+	}
+	else
+	{
+		// some other error interrupted the read
+	}
+
+}
+
+void Initialize()
+{
+	// Memory for BankAccounts
+	BankAccounts = calloc(1000, sizeof(BankAccount));
+
+	// Datei oeffnen
+	fileStream = fopen("accounts.txt", "r");
+
+	if (fileStream == NULL) {
+		// Create new file if not exist
+		fileStream = fopen("accounts.txt", "a");
+		printf("Neue Datei wurde angelegt\n");
+	}
+
+	// Load all BankAccounts from File
+
+	LoadBankAccounts();
+}
 
 int main(int argc, char* argv[])
 {
@@ -96,5 +201,11 @@ int main(int argc, char* argv[])
 		// lese arg 1 ein
 	}
 
+
+	Initialize();
+
+
 	OpenStartMenu();
+
+	freeArray(BankAccounts);
 }
