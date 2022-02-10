@@ -10,34 +10,9 @@
 // Dateizeiger erstellen
 FILE* fileStream;
 
-typedef enum
-{
-	Deposit,
-	Withdraw
-}TransactionType;
 
-typedef struct
-{
-	TransactionType type;
-	char* DateTime;
-	int Value;
-}Transaction;
 
-typedef struct
-{
-	char* FirstName;
-	char* LastName;
-	char* BirthDate;
-	char* Adress;
-	int AccountNumber;
-	char* LastLogin;
-	struct Transaction* Transaction;
-	int Transactions;
-	struct BankAccount* prev;
-	struct BankAccount* next;
-}BankAccount;
-
-BankAccount* BankAccounts = NULL;
+BankAccounts* _BankAccounts = NULL;
 
 void CloseApp(void)
 {
@@ -71,12 +46,7 @@ void CreateNewAccount(void)
 	system("cls");
 
 
-	if (BankAccounts[0] == NULL)
-	{
-
-	}
-
-	for (int i = 0; i < sizeof(BankAccounts) / sizeof(BankAccounts[0]); i++)
+	for (int i = 0; i < sizeof(_BankAccounts) / sizeof(_BankAccounts->array[0]); i++)
 	{
 
 	}
@@ -96,12 +66,7 @@ void CreateNewAccount(void)
 
 	}
 
-
-
-
 	printf("Herzlichen Glückwunsch. Konto wurde erfolgreich eröffnet");
-
-
 }
 
 
@@ -169,13 +134,18 @@ void LoadBankAccounts()
 	{
 		// some other error interrupted the read
 	}
+}
 
+void AddDummyData()
+{
+	BankAccount bankAccount = {"Erik", "Kaufmann"};
+	insertArray(_BankAccounts, &bankAccount);
 }
 
 void Initialize()
 {
 	// Memory for BankAccounts
-	BankAccounts = calloc(1000, sizeof(BankAccount));
+	initArray(&_BankAccounts, 2);
 
 	// Datei oeffnen
 	fileStream = fopen("accounts.txt", "r");
@@ -207,5 +177,5 @@ int main(int argc, char* argv[])
 
 	OpenStartMenu();
 
-	freeArray(BankAccounts);
+	freeArray(&_BankAccounts);
 }

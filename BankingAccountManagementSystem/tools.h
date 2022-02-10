@@ -4,7 +4,43 @@ void PrintDatum();
 int IsNumber(char* string);
 int SeparateThousands(char* text);
 
-void freeArray(Array* a);
+typedef enum {
+	Deposit,
+	Withdraw
+}TransactionType;
+
+typedef struct
+{
+	TransactionType type;
+	char* DateTime;
+	int Value;
+}Transaction;
+
+typedef struct
+{
+	char* FirstName;
+	char* LastName;
+	char* BirthDate;
+	char* Adress;
+	int AccountNumber;
+	char* LastLogin;
+	struct Transaction* Transaction;
+	int Transactions;
+	struct BankAccount* prev;
+	struct BankAccount* next;
+}BankAccount;
+
+typedef struct {
+	int* array;
+	int used;
+	int size;
+} BankAccounts;
+
+void freeArray(BankAccounts* a);
+
+void initArray(BankAccounts* a, int initialSize);
+
+void insertArray(BankAccounts* a, BankAccount * element);
 
 #define RED   "\x1B[31m"
 #define GRN   "\x1B[32m"
