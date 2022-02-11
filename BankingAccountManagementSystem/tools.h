@@ -14,7 +14,9 @@ typedef struct
 	TransactionType type;
 	char* DateTime;
 	int Value;
-}Transaction;
+	struct Transaction* prev;
+	struct Transaction* next;
+} Transaction;
 
 typedef struct
 {
@@ -22,25 +24,13 @@ typedef struct
 	char* LastName;
 	char* BirthDate;
 	char* Adress;
-	int AccountNumber;
 	char* LastLogin;
-	struct Transaction* Transaction;
-	int Transactions;
+	int AccountNumber;
+	//struct Transaction* Transaction;
 	struct BankAccount* prev;
 	struct BankAccount* next;
 }BankAccount;
 
-typedef struct {
-	int* array;
-	int used;
-	int size;
-} BankAccounts;
-
-void freeArray(BankAccounts* a);
-
-void initArray(BankAccounts* a, int initialSize);
-
-void insertArray(BankAccounts* a, BankAccount * element);
 
 #define RED   "\x1B[31m"
 #define GRN   "\x1B[32m"

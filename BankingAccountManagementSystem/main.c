@@ -10,9 +10,7 @@
 // Dateizeiger erstellen
 FILE* fileStream;
 
-
-
-BankAccounts* _BankAccounts = NULL;
+BankAccount* BankAccountHead = NULL;
 
 void CloseApp(void)
 {
@@ -31,25 +29,25 @@ void CloseApp(void)
 
 void CreateNewAccount(void)
 {
-	BankAccount* bankAccount = malloc(sizeof(BankAccount));
+	//BankAccounts* bankAccounts = malloc(sizeof(BankAccounts));
 
-	printf("Bitte geben Sie Ihren Vornamen ein");
-	scanf("%s", bankAccount->FirstName);
-	system("cls");
+	//printf("Bitte geben Sie Ihren Vornamen ein");
+	//scanf("%s", bankAccount->FirstName);
+	//system("cls");
 
-	printf("Bitte geben Sie Ihren Nachnamen ein");
-	scanf("%s", bankAccount->LastName);
-	system("cls");
+	//printf("Bitte geben Sie Ihren Nachnamen ein");
+	//scanf("%s", bankAccount->LastName);
+	//system("cls");
 
-	printf("Bitte geben Ihren Geburtsdatum in folgendem Format ein: DD.MM.YYYY z.B. 01.03.1972");
-	scanf("%s", bankAccount->BirthDate);
-	system("cls");
+	//printf("Bitte geben Ihren Geburtsdatum in folgendem Format ein: DD.MM.YYYY z.B. 01.03.1972");
+	//scanf("%s", bankAccount->BirthDate);
+	//system("cls");
 
 
-	for (int i = 0; i < sizeof(_BankAccounts) / sizeof(_BankAccounts->array[0]); i++)
-	{
+	//for (int i = 0; i < sizeof(_BankAccounts) / sizeof(_BankAccounts->array[0]); i++)
+	//{
 
-	}
+	//}
 
 	// Kontonummer ermitteln
 	// Get Latests KontoNummer von allen gefundenen Konten
@@ -136,16 +134,63 @@ void LoadBankAccounts()
 	}
 }
 
+void AddToList(BankAccount* head, BankAccount* newAccount)
+{
+	if (head == NULL)
+	{
+		head = newAccount;
+		head->prev = NULL;
+		head->next = NULL;
+	}
+	else
+	{
+		BankAccount* current = head;
+		while (1) {
+			if (current->next == NULL)
+			{
+				current->next = newAccount;
+				newAccount->prev = current;
+				break; 
+			}
+			current = current->next;
+		};
+	}
+}
+
 void AddDummyData()
 {
-	BankAccount bankAccount = {"Erik", "Kaufmann"};
-	insertArray(_BankAccounts, &bankAccount);
+	BankAccountHead = NULL;
+
+	BankAccount * acc1 = malloc(sizeof(BankAccount));
+	acc1->FirstName = "Erik";
+	acc1->LastName = "Kaufmann";
+	acc1->AccountNumber = "123456";
+	acc1->BirthDate = "06.07.1991";
+	acc1->Adress = "Testwohnort";
+	acc1->LastLogin = "11.02.2022";
+	AddToList(BankAccountHead, acc1);
+
+	BankAccount * acc2 = malloc(sizeof(BankAccount));
+	acc2->FirstName = "Pascal";
+	acc2->LastName = "Lorenz";
+	acc2->AccountNumber = "99999";
+	acc2->BirthDate = "01.01.2001";
+	acc2->Adress = "Testwohnort";
+	acc2->LastLogin = "11.02.2022";
+
+
+	AddToList(BankAccountHead, acc2);
+
+	for (BankAccount *current = BankAccountHead; current->next == NULL;)
+	{
+		printf("------------------------------------");
+		printf("Nachname:%s Vorname:%s \n\n", current->FirstName, current->LastName);
+	}
 }
 
 void Initialize()
 {
-	// Memory for BankAccounts
-	initArray(&_BankAccounts, 2);
+	AddDummyData();
 
 	// Datei oeffnen
 	fileStream = fopen("accounts.txt", "r");
@@ -176,6 +221,4 @@ int main(int argc, char* argv[])
 
 
 	OpenStartMenu();
-
-	freeArray(&_BankAccounts);
 }
