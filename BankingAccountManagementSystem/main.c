@@ -2,15 +2,18 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 #include "tools.h"
-
 
 #define DEFAULT_KONTO_NUMMER 1337000
 
-// Dateizeiger erstellen
-FILE* fileStream;
+BankAccount BankAccounts[1024];
 
-BankAccount* BankAccountHead = NULL;
+BankAccount* _BankAccountHead = NULL;
+BankAccount* _BankAccountTail = NULL;
+
+// Dateizeiger erstellen
+FILE* fStream;
 
 void CloseApp(void)
 {
@@ -24,6 +27,10 @@ void CloseApp(void)
 	}
 
 	system("cls");
+
+	free(_BankAccountHead);
+	free(_BankAccountTail);
+
 	return 1;
 }
 
@@ -54,9 +61,9 @@ void CreateNewAccount(void)
 	// Öffne Datei und liefere letzte Kontonummer --> Zähle 1 hoch und verwende diese als neue Konto Nummer
 
 		// Datei oeffnen
-	fileStream = fopen("accounts.txt", "r");
+	fStream = fopen("accounts.txt", "r");
 
-	if (fileStream == NULL) {
+	if (fStream == NULL) {
 		// File konnte nicht geöffnet werden
 	}
 	else {
@@ -66,7 +73,6 @@ void CreateNewAccount(void)
 
 	printf("Herzlichen Glückwunsch. Konto wurde erfolgreich eröffnet");
 }
-
 
 int OpenStartMenu()
 {
@@ -114,94 +120,66 @@ int OpenStartMenu()
 
 void LoadBankAccounts()
 {
-	int c;
+	int bufferLength = 255;
+	char* buffer = malloc(sizeof(bufferLength + 1));
+	int i = 0;
 	// Datei oeffnen
-	fileStream = fopen("accounts.txt", "r");
+	fStream = fopen("accounts.txt", "r");
 
-	char* buffer = calloc(1024, sizeof(char));
+	if (fStream != NULL)
+	{
+		char* next_token1 = NULL;
+		char* next_token2 = NULL;
+		while (fgets(buffer, bufferLength, fStream))
+		{
+			BankAccount bankAccount_ = BankAccounts[i++];
+			BankAccount* bankAccount = &bankAccount_;
+			//printf("%s", buffer);
+			// Remove whitespace from buffer
+			remove_spaces(buffer);
+			//printf("%s", buffer);
 
-	while (fscanf(fileStream, "%s", buffer) == 1) // expect 1 successful conversion
-	{
-		// process buffer
-	}
-	if (feof(fileStream))
-	{
-		// hit end of file
-	}
-	else
-	{
-		// some other error interrupted the read
-	}
-}
+			// Separation by ';'
+			char* token1 = strtok_s(buffer, ";", &next_token1);
+			char* token2 = malloc(bufferLength * (sizeof(char)));
+			/* walk through other tokens */
+			while (token1 != NULL) {
+				//printf("%s\n", token1);
 
-void AddToList(BankAccount* head, BankAccount* newAccount)
-{
-	if (head == NULL)
-	{
-		head = newAccount;
-		head->prev = NULL;
-		head->next = NULL;
-	}
-	else
-	{
-		BankAccount* current = head;
-		while (1) {
-			if (current->next == NULL)
-			{
-				current->next = newAccount;
-				newAccount->prev = current;
-				break; 
+				token2 = strtok_s(token1, ":", &next_token2);
+
+				// Key
+				if (strcmp(token2, "Vorname") == 0)
+				{
+					token2 = strtok_s(NULL, ":", &next_token2);
+					bankAccount->FirstName = token2;
+				}
+				else if (strcmp(token2, "Nachname") == 0)
+				{
+					token2 = strtok_s(NULL, ":", &next_token2);
+					bankAccount->LastName = token2;
+				}
+
+				token1 = strtok_s(NULL, ";", &next_token1);
+
 			}
-			current = current->next;
-		};
+			PushAtTheEnd(_BankAccountHead, bankAccount);
+		}
+		printf(GRN"\t\t Daten erfolgreich geladen!\n" RESET);
 	}
-}
-
-void AddDummyData()
-{
-	BankAccountHead = NULL;
-
-	BankAccount * acc1 = malloc(sizeof(BankAccount));
-	acc1->FirstName = "Erik";
-	acc1->LastName = "Kaufmann";
-	acc1->AccountNumber = "123456";
-	acc1->BirthDate = "06.07.1991";
-	acc1->Adress = "Testwohnort";
-	acc1->LastLogin = "11.02.2022";
-	AddToList(BankAccountHead, acc1);
-
-	BankAccount * acc2 = malloc(sizeof(BankAccount));
-	acc2->FirstName = "Pascal";
-	acc2->LastName = "Lorenz";
-	acc2->AccountNumber = "99999";
-	acc2->BirthDate = "01.01.2001";
-	acc2->Adress = "Testwohnort";
-	acc2->LastLogin = "11.02.2022";
-
-
-	AddToList(BankAccountHead, acc2);
-
-	for (BankAccount *current = BankAccountHead; current->next == NULL;)
+	else
 	{
-		printf("------------------------------------");
-		printf("Nachname:%s Vorname:%s \n\n", current->FirstName, current->LastName);
+		printf(RED"\t\t Datenbank Datei konnte nicht geöffnet werden\n" RESET);
 	}
+
+	PrintList(_BankAccountHead);
 }
+
 
 void Initialize()
 {
-	AddDummyData();
-
-	// Datei oeffnen
-	fileStream = fopen("accounts.txt", "r");
-
-	if (fileStream == NULL) {
-		// Create new file if not exist
-		fileStream = fopen("accounts.txt", "a");
-		printf("Neue Datei wurde angelegt\n");
-	}
-
-	// Load all BankAccounts from File
+	// Add DummyData 
+	//AddDummyData();
 
 	LoadBankAccounts();
 }
@@ -218,7 +196,6 @@ int main(int argc, char* argv[])
 
 
 	Initialize();
-
 
 	OpenStartMenu();
 }
