@@ -34,8 +34,6 @@ typedef struct
 	struct BankAccount* next;
 }BankAccount;
 
-
-
 #pragma once
 void HoldTerminal();
 void PrintDatum();
@@ -43,8 +41,9 @@ int IsNumber(char* string);
 int SeparateThousands(char* text);
 void AddDummyData();
 void PushAtTheEnd(BankAccount** head, BankAccount** newAccount);
-void PrintList(BankAccount* n);
+void PrintList(BankAccount* n, int highlightNewest);
 void remove_spaces(char* s);
+BankAccount CreateBankAccount();
 
 extern BankAccount* _BankAccountTail;
 extern BankAccount* _BankAccountHead;

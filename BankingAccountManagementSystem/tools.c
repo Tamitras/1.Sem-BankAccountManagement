@@ -228,7 +228,7 @@ void AddDummyData()
 	acc10->LastLogin = "11.02.2022";
 	PushAtTheEnd(_BankAccountHead, acc10);
 
-	
+
 	//PrintList(_BankAccountHead);
 
 		// Datei oeffnen
@@ -256,6 +256,18 @@ void AddDummyData()
 	printf(GRN"\t\t Speichern erfolgreich\n" RESET);
 }
 
+BankAccount CreateBankAccount() {
+	//BankAccount * temp= malloc(sizeof(BankAccount));	// allocate memory using malloc()
+	//temp->next = temp->prev = NULL;						// make next point to NULL
+	//temp->FirstName = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+
+
+	BankAccount temp;
+	temp.next = temp.prev = NULL;
+	temp.FirstName = "!!!!!!!!!!!!!!!!!!!!!!!";
+	return temp;										//return the new node
+}
+
 void PushAtTheEnd(BankAccount** head, BankAccount** newAccount)
 {
 	if (head != NULL)
@@ -269,32 +281,43 @@ void PushAtTheEnd(BankAccount** head, BankAccount** newAccount)
 		lastNode->next = (BankAccount*)newAccount;
 		((BankAccount*)newAccount)->next = NULL;
 
-		printf("Added: %s %s \n", ((BankAccount*)newAccount)->FirstName, ((BankAccount*)newAccount)->LastName);
+		//printf("Added: %s %s \n", ((BankAccount*)newAccount)->FirstName, ((BankAccount*)newAccount)->LastName);
 	}
 	else
 	{
 		_BankAccountHead = _BankAccountTail = (BankAccount*)newAccount;
 		_BankAccountHead->next = _BankAccountTail->next = NULL;
 		_BankAccountHead->prev = _BankAccountTail->prev = NULL;
-		printf("Initial hinzugefügt: %s %s \n", ((BankAccount*)newAccount)->FirstName, ((BankAccount*)newAccount)->LastName);
+		//printf("Initial hinzugefügt: %s %s \n", ((BankAccount*)newAccount)->FirstName, ((BankAccount*)newAccount)->LastName);
 	}
 }
 
-void PrintList(BankAccount* n)
+void PrintList(BankAccount* n, int highlightNewest)
 {
 	printf("------------------------------------\n");
-	while (n != NULL) 
+	while (n != NULL)
 	{
 		BankAccount* prev = (BankAccount*)n->prev;
 		BankAccount* next = (BankAccount*)n->next;
 		char* prevName = ((BankAccount*)n->prev) ? ((BankAccount*)n->prev)->FirstName : "void*";
 		char* nextName = ((BankAccount*)n->next) ? ((BankAccount*)n->next)->FirstName : "void*";
-		printf("Vorname: %-14s Nachname: %-14s Davor: %-14s Danach: %-14s \n", n->FirstName, n->LastName, prevName, nextName);
+
+		if (highlightNewest)
+		{
+			if (n->next)
+				printf("Vorname: %-14s Nachname: %-14s Davor: %-14s Danach: %-14s \n", n->FirstName, n->LastName, prevName, nextName);
+			else
+				printf(GRN"\t\t\t\t\t -------- new --------\n" RESET);
+				printf("Vorname: %-14s Nachname: %-14s Davor: %-14s Danach: %-14s \n", n->FirstName, n->LastName, prevName, nextName);
+		}
+		else
+			printf("Vorname: %-14s Nachname: %-14s Davor: %-14s Danach: %-14s \n", n->FirstName, n->LastName, prevName, nextName);
+
 		n = n->next;
 	}
 }
 
-void remove_spaces(char* s) 
+void remove_spaces(char* s)
 {
 	char* d = s;
 	do {

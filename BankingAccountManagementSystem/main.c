@@ -7,7 +7,7 @@
 
 #define DEFAULT_KONTO_NUMMER 1337000
 
-BankAccount BankAccounts[1024];
+BankAccount* BankAccounts;
 
 BankAccount* _BankAccountHead = NULL;
 BankAccount* _BankAccountTail = NULL;
@@ -34,27 +34,48 @@ void CloseApp(void)
 	return 1;
 }
 
+int GetArrayLength(BankAccount* head)
+{
+	int counter = 0;
+	if (head != NULL)
+	{
+		counter = 1;
+		BankAccount* lastNode = ((BankAccount*)head);
+
+		while (lastNode->next != NULL)
+		{
+			lastNode = lastNode->next;
+			counter++;
+		}
+	}
+	return counter;
+}
+
 void CreateNewAccount(void)
 {
-	//BankAccounts* bankAccounts = malloc(sizeof(BankAccounts));
+	int current = GetArrayLength(_BankAccountHead);
+	char birthDate[250];
 
-	//printf("Bitte geben Sie Ihren Vornamen ein");
-	//scanf("%s", bankAccount->FirstName);
-	//system("cls");
+	BankAccount* newBankAccount = &BankAccounts[current++];
 
-	//printf("Bitte geben Sie Ihren Nachnamen ein");
-	//scanf("%s", bankAccount->LastName);
-	//system("cls");
+	printf("Bitte geben Sie Ihren Vornamen ein\n# ");
+	scanf("%s", newBankAccount->FirstName);
+	system("cls");
 
-	//printf("Bitte geben Ihren Geburtsdatum in folgendem Format ein: DD.MM.YYYY z.B. 01.03.1972");
-	//scanf("%s", bankAccount->BirthDate);
-	//system("cls");
+	printf("Bitte geben Sie Ihren Nachnamen ein\n# ");
+	scanf("%s", newBankAccount->LastName);
+	system("cls");
 
+	printf("Bitte geben Ihren Geburtsdatum in folgendem Format ein: DD.MM.YYYY z.B. 01.03.1972\n# ");
 
-	//for (int i = 0; i < sizeof(_BankAccounts) / sizeof(_BankAccounts->array[0]); i++)
-	//{
+	scanf("%s", birthDate);
+	//scanf("%s", newBankAccount->BirthDate);
+	newBankAccount->BirthDate = _strdup(birthDate);
+	system("cls");
 
-	//}
+	PushAtTheEnd(_BankAccountHead, newBankAccount);
+
+	PrintList(_BankAccountHead, 1);
 
 	// Kontonummer ermitteln
 	// Get Latests KontoNummer von allen gefundenen Konten
@@ -68,7 +89,6 @@ void CreateNewAccount(void)
 	}
 	else {
 		// Save new Account to file
-
 	}
 
 	printf("Herzlichen Glückwunsch. Konto wurde erfolgreich eröffnet");
@@ -121,7 +141,9 @@ int OpenStartMenu()
 void LoadBankAccounts()
 {
 	int bufferLength = 255;
-	char* buffer = malloc(sizeof(bufferLength + 1));
+	char* token2 = malloc(bufferLength * sizeof(char));
+	char* buffer = malloc(bufferLength + 1 * sizeof(char));
+
 	int i = 0;
 	// Datei oeffnen
 	fStream = fopen("accounts.txt", "r");
@@ -130,40 +152,37 @@ void LoadBankAccounts()
 	{
 		char* next_token1 = NULL;
 		char* next_token2 = NULL;
+
 		while (fgets(buffer, bufferLength, fStream))
 		{
-			BankAccount bankAccount_ = BankAccounts[i++];
-			BankAccount* bankAccount = &bankAccount_;
-			//printf("%s", buffer);
-			// Remove whitespace from buffer
-			remove_spaces(buffer);
-			//printf("%s", buffer);
+			BankAccount * newBankAccount = &BankAccounts[i++];
 
-			// Separation by ';'
-			char* token1 = strtok_s(buffer, ";", &next_token1);
-			char* token2 = malloc(bufferLength * (sizeof(char)));
-			/* walk through other tokens */
+			remove_spaces(buffer);									// Remove whitespace from buffer
+			char* token1 = strtok_s(buffer, ";", &next_token1);		// Separation by ';'
+
 			while (token1 != NULL) {
-				//printf("%s\n", token1);
 
-				token2 = strtok_s(token1, ":", &next_token2);
+				char* _token2 = strtok_s(token1, ":", &next_token2);
+				token2 = _strdup(_token2); // duplicate string
 
 				// Key
 				if (strcmp(token2, "Vorname") == 0)
 				{
-					token2 = strtok_s(NULL, ":", &next_token2);
-					bankAccount->FirstName = token2;
+					_token2 = strtok_s(NULL, ":", &next_token2);
+					token2 = _strdup(_token2); // duplicate value
+					newBankAccount->FirstName = token2;
 				}
 				else if (strcmp(token2, "Nachname") == 0)
 				{
-					token2 = strtok_s(NULL, ":", &next_token2);
-					bankAccount->LastName = token2;
+					_token2 = strtok_s(NULL, ":", &next_token2);
+					token2 = _strdup(_token2);// duplicate value
+					newBankAccount->LastName = token2;
 				}
 
 				token1 = strtok_s(NULL, ";", &next_token1);
-
 			}
-			PushAtTheEnd(_BankAccountHead, bankAccount);
+
+			PushAtTheEnd(_BankAccountHead, newBankAccount);
 		}
 		printf(GRN"\t\t Daten erfolgreich geladen!\n" RESET);
 	}
@@ -172,7 +191,9 @@ void LoadBankAccounts()
 		printf(RED"\t\t Datenbank Datei konnte nicht geöffnet werden\n" RESET);
 	}
 
-	PrintList(_BankAccountHead);
+	PrintList(_BankAccountHead, 0);
+	free(buffer);
+	free(token2);
 }
 
 
@@ -186,6 +207,8 @@ void Initialize()
 
 int main(int argc, char* argv[])
 {
+	BankAccounts = malloc(1024 * sizeof(BankAccount));
+
 	if (argc > 0) {
 		// lese arg 1 ein
 	}
