@@ -8,7 +8,7 @@
 #include <time.h>
 #include "tools.h"
 
-
+int default_accountNumber = 1337000;
 
 // Private Start
 void initMultiArray(char** p, int m, int n)
@@ -135,6 +135,44 @@ int SeparateThousands(char* text)
 	return s;
 }
 
+void SaveListInFile(BankAccount* head)
+{
+	// Datei oeffnen
+	fStream = fopen("accounts.txt", "wb");
+
+	if (fStream == NULL) {
+		// Create new file if not exist
+		printf("Neue Datei wurde angelegt\n");
+	}
+
+	printf("\t\t Dummy Daten werden als TXT gespeichert\n\n");
+	while (_BankAccountHead != NULL) {
+
+		char* prevName = ((BankAccount*)_BankAccountHead->prev) ? ((BankAccount*)_BankAccountHead->prev)->FirstName : "NULL(void*)";
+		char* nextName = ((BankAccount*)_BankAccountHead->next) ? ((BankAccount*)_BankAccountHead->next)->FirstName : "NULL(void*)";
+
+		// Write concatted string into fileStream
+		fprintf(fStream,
+			"Vorname: %-14s;"
+			"Nachname: %-14s;"
+			"KontoNummer: %-14d;"
+			"Davor: %-14s;"
+			"Danach: %-14s"
+			"\n",
+			_BankAccountHead->FirstName,
+			_BankAccountHead->LastName,
+			_BankAccountHead->AccountNumber,
+			prevName,
+			nextName);
+
+		//fwrite(_BankAccountHead, sizeof(BankAccount), 1, fStream);
+		_BankAccountHead = _BankAccountHead->next;
+	}
+
+	fclose(fStream);
+	printf(GRN"\t\t Speichern erfolgreich\n\n" RESET);
+}
+
 void AddDummyData()
 {
 	BankAccount* acc1 = malloc(sizeof(BankAccount));
@@ -154,6 +192,7 @@ void AddDummyData()
 	acc1->BirthDate = "06.07.1991";
 	acc1->Adress = "Testwohnort";
 	acc1->LastLogin = "11.02.2022";
+	acc1->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc1);
 
 	acc2->FirstName = "Pascal";
@@ -162,6 +201,7 @@ void AddDummyData()
 	acc2->BirthDate = "01.01.2001";
 	acc2->Adress = "Testwohnort";
 	acc2->LastLogin = "11.02.2022";
+	acc2->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc2);
 
 	acc3->FirstName = "Lukas";
@@ -170,6 +210,7 @@ void AddDummyData()
 	acc3->BirthDate = "01.01.2001";
 	acc3->Adress = "Testwohnort";
 	acc3->LastLogin = "11.02.2022";
+	acc3->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc3);
 
 	acc4->FirstName = "Donald";
@@ -178,6 +219,7 @@ void AddDummyData()
 	acc4->BirthDate = "01.01.2001";
 	acc4->Adress = "Testwohnort";
 	acc4->LastLogin = "11.02.2022";
+	acc4->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc4);
 
 	acc5->FirstName = "Winfred";
@@ -186,6 +228,7 @@ void AddDummyData()
 	acc5->BirthDate = "01.01.2001";
 	acc5->Adress = "Testwohnort";
 	acc5->LastLogin = "11.02.2022";
+	acc5->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc5);
 
 	acc6->FirstName = "Freddy";
@@ -194,6 +237,7 @@ void AddDummyData()
 	acc6->BirthDate = "01.01.2001";
 	acc6->Adress = "Testwohnort";
 	acc6->LastLogin = "11.02.2022";
+	acc6->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc6);
 
 	acc7->FirstName = "Osama";
@@ -202,6 +246,7 @@ void AddDummyData()
 	acc7->BirthDate = "01.01.2001";
 	acc7->Adress = "Testwohnort";
 	acc7->LastLogin = "11.02.2022";
+	acc7->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc7);
 
 	acc8->FirstName = "Max";
@@ -210,6 +255,7 @@ void AddDummyData()
 	acc8->BirthDate = "01.01.2001";
 	acc8->Adress = "Testwohnort";
 	acc8->LastLogin = "11.02.2022";
+	acc8->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc8);
 
 	acc9->FirstName = "Rolf";
@@ -218,6 +264,7 @@ void AddDummyData()
 	acc9->BirthDate = "01.01.2001";
 	acc9->Adress = "Testwohnort";
 	acc9->LastLogin = "11.02.2022";
+	acc9->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc9);
 
 	acc10->FirstName = "Liselotte";
@@ -226,34 +273,22 @@ void AddDummyData()
 	acc10->BirthDate = "01.01.2001";
 	acc10->Adress = "Testwohnort";
 	acc10->LastLogin = "11.02.2022";
+	acc10->AccountNumber = default_accountNumber++;
 	PushAtTheEnd(_BankAccountHead, acc10);
 
+	// Save in File
+	SaveListInFile(_BankAccountHead);
 
-	//PrintList(_BankAccountHead);
-
-		// Datei oeffnen
-	fStream = fopen("accounts.txt", "wb");
-
-	if (fStream == NULL) {
-		// Create new file if not exist
-		printf("Neue Datei wurde angelegt\n");
-	}
-
-	printf("\t\t Dummy Daten werden als TXT gespeichert\n");
-	while (_BankAccountHead != NULL) {
-
-		char* prevName = ((BankAccount*)_BankAccountHead->prev) ? ((BankAccount*)_BankAccountHead->prev)->FirstName : "void*";
-		char* nextName = ((BankAccount*)_BankAccountHead->next) ? ((BankAccount*)_BankAccountHead->next)->FirstName : "void*";
-
-		// Write concatted string into fileStream
-		fprintf(fStream, "Vorname: %-14s Nachname: %-14s Davor: %-14s Danach: %-14s \n", _BankAccountHead->FirstName, _BankAccountHead->LastName, prevName, nextName);
-
-		//fwrite(_BankAccountHead, sizeof(BankAccount), 1, fStream);
-		_BankAccountHead = _BankAccountHead->next;
-	}
-
-	fclose(fStream);
-	printf(GRN"\t\t Speichern erfolgreich\n" RESET);
+	free(acc1);
+	free(acc2);
+	free(acc3);
+	free(acc4);
+	free(acc5);
+	free(acc6);
+	free(acc7);
+	free(acc8);
+	free(acc9);
+	free(acc10);
 }
 
 BankAccount CreateBankAccount() {
@@ -273,13 +308,14 @@ void PushAtTheEnd(BankAccount** head, BankAccount** newAccount)
 	if (head != NULL)
 	{
 		BankAccount* lastNode = ((BankAccount*)head);
+		BankAccount* newNode = ((BankAccount*)newAccount);
 
 		while (lastNode->next != NULL)
 			lastNode = lastNode->next;
 
-		((BankAccount*)newAccount)->prev = lastNode;
-		lastNode->next = (BankAccount*)newAccount;
-		((BankAccount*)newAccount)->next = NULL;
+		newNode->prev = lastNode;
+		lastNode->next = newNode;
+		newNode->next = NULL;
 
 		//printf("Added: %s %s \n", ((BankAccount*)newAccount)->FirstName, ((BankAccount*)newAccount)->LastName);
 	}
@@ -295,23 +331,40 @@ void PushAtTheEnd(BankAccount** head, BankAccount** newAccount)
 void PrintList(BankAccount* n, int highlightNewest)
 {
 	printf("------------------------------------\n");
+	char* result = malloc(1024 * sizeof(char));
+	char* temp = malloc(1024 * sizeof(char));
+
 	while (n != NULL)
 	{
 		BankAccount* prev = (BankAccount*)n->prev;
 		BankAccount* next = (BankAccount*)n->next;
-		char* prevName = ((BankAccount*)n->prev) ? ((BankAccount*)n->prev)->FirstName : "void*";
-		char* nextName = ((BankAccount*)n->next) ? ((BankAccount*)n->next)->FirstName : "void*";
+		char* prevName = ((BankAccount*)n->prev) ? ((BankAccount*)n->prev)->FirstName : "NULL(void*)";
+		char* nextName = ((BankAccount*)n->next) ? ((BankAccount*)n->next)->FirstName : "NULL(void*)";
+
+		sprintf(result,
+			"Vorname: %-14s;"
+			"Nachname: %-14s;"
+			"KontoNummer: %-14d;"
+			"Davor: %-14s;"
+			"Danach: %-14s",
+			n->FirstName,
+			n->LastName,
+			n->AccountNumber,
+			prevName,
+			nextName);		
 
 		if (highlightNewest)
 		{
 			if (n->next)
-				printf("Vorname: %-14s Nachname: %-14s Davor: %-14s Danach: %-14s \n", n->FirstName, n->LastName, prevName, nextName);
+				printf("%s\n", result);
 			else
-				printf(GRN"\t\t\t\t\t -------- new --------\n" RESET);
-				printf("Vorname: %-14s Nachname: %-14s Davor: %-14s Danach: %-14s \n", n->FirstName, n->LastName, prevName, nextName);
+			{
+				printf(YEL"\n\t\t\t\t\t -------- new --------\n" RESET);
+				printf(GRN"%s\n\n"RESET, result);
+			}
 		}
 		else
-			printf("Vorname: %-14s Nachname: %-14s Davor: %-14s Danach: %-14s \n", n->FirstName, n->LastName, prevName, nextName);
+			printf("%s\n", result);
 
 		n = n->next;
 	}

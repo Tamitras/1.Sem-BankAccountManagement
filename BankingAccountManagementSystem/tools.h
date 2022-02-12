@@ -44,6 +44,7 @@ void PushAtTheEnd(BankAccount** head, BankAccount** newAccount);
 void PrintList(BankAccount* n, int highlightNewest);
 void remove_spaces(char* s);
 BankAccount CreateBankAccount();
+void SaveListInFile(BankAccount* head);
 
 extern BankAccount* _BankAccountTail;
 extern BankAccount* _BankAccountHead;

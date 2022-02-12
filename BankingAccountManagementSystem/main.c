@@ -5,8 +5,6 @@
 #include <string.h>
 #include "tools.h"
 
-#define DEFAULT_KONTO_NUMMER 1337000
-
 BankAccount* BankAccounts;
 
 BankAccount* _BankAccountHead = NULL;
@@ -30,7 +28,7 @@ void CloseApp(void)
 
 	free(_BankAccountHead);
 	free(_BankAccountTail);
-
+	free(BankAccounts);
 	return 1;
 }
 
@@ -51,19 +49,39 @@ int GetArrayLength(BankAccount* head)
 	return counter;
 }
 
+int getAccountNumber(BankAccount* head)
+{
+	int accountNumber = 0;
+	if (head != NULL)
+	{
+		BankAccount* lastNode = ((BankAccount*)head);
+
+		while (lastNode->next != NULL)
+		{
+			lastNode = lastNode->next;
+		}
+
+		accountNumber = lastNode->AccountNumber;
+	}
+	return ++accountNumber;
+}
+
 void CreateNewAccount(void)
 {
-	int current = GetArrayLength(_BankAccountHead);
-	char birthDate[250];
-
+	int current = GetArrayLength(BankAccounts);
 	BankAccount* newBankAccount = &BankAccounts[current++];
+	_BankAccountHead = &BankAccounts[0];
+	char birthDate[250];
+	char firstName[250];
+	char lastName[250];
+	int accountNumber;
 
 	printf("Bitte geben Sie Ihren Vornamen ein\n# ");
-	scanf("%s", newBankAccount->FirstName);
+	scanf("%s", firstName);
 	system("cls");
 
 	printf("Bitte geben Sie Ihren Nachnamen ein\n# ");
-	scanf("%s", newBankAccount->LastName);
+	scanf("%s", lastName);
 	system("cls");
 
 	printf("Bitte geben Ihren Geburtsdatum in folgendem Format ein: DD.MM.YYYY z.B. 01.03.1972\n# ");
@@ -71,27 +89,22 @@ void CreateNewAccount(void)
 	scanf("%s", birthDate);
 	//scanf("%s", newBankAccount->BirthDate);
 	newBankAccount->BirthDate = _strdup(birthDate);
+	newBankAccount->FirstName = _strdup(firstName);
+	newBankAccount->LastName = _strdup(lastName);
+	newBankAccount->AccountNumber = getAccountNumber(_BankAccountHead);
+	newBankAccount->next = NULL;
 	system("cls");
 
+	// Add To List
 	PushAtTheEnd(_BankAccountHead, newBankAccount);
 
+	// PrintList
 	PrintList(_BankAccountHead, 1);
 
-	// Kontonummer ermitteln
-	// Get Latests KontoNummer von allen gefundenen Konten
-	// Öffne Datei und liefere letzte Kontonummer --> Zähle 1 hoch und verwende diese als neue Konto Nummer
+	// Save in List
+	SaveListInFile(_BankAccountHead);
 
-		// Datei oeffnen
-	fStream = fopen("accounts.txt", "r");
-
-	if (fStream == NULL) {
-		// File konnte nicht geöffnet werden
-	}
-	else {
-		// Save new Account to file
-	}
-
-	printf("Herzlichen Glückwunsch. Konto wurde erfolgreich eröffnet");
+	printf("Herzlichen Glückwunsch. Konto wurde erfolgreich eröffnet\n\n");
 }
 
 int OpenStartMenu()
@@ -178,6 +191,12 @@ void LoadBankAccounts()
 					token2 = _strdup(_token2);// duplicate value
 					newBankAccount->LastName = token2;
 				}
+				else if (strcmp(token2, "KontoNummer") == 0)
+				{
+					_token2 = strtok_s(NULL, ":", &next_token2);
+					token2 = _strdup(_token2);// duplicate value
+					newBankAccount->AccountNumber = atoi(token2);
+				}
 
 				token1 = strtok_s(NULL, ";", &next_token1);
 			}
@@ -192,6 +211,8 @@ void LoadBankAccounts()
 	}
 
 	PrintList(_BankAccountHead, 0);
+	_BankAccountHead = &BankAccounts[0];
+	fclose(fStream);
 	free(buffer);
 	free(token2);
 }
