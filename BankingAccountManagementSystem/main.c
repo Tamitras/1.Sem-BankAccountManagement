@@ -87,23 +87,14 @@ void RemoveAccount()
 {
 	int bankAccountLength = GetArrayLength(&_BankAccountHead);
 
-	int toDelete[20];
-	for (int i = 0; i < 20; i++)
-	{
-		toDelete[i] = -1;
-	}
-
-	char toDeleteAsChar[20];
+	int toDelete[5] = {-1,-1,-1,-1,-1};
 	int decision = -1;
 	int exitReading = 0;
-	char decisionAsChar[1000];
 
 	printf("\n\n\t\tWählen Sie einen Index den sie Löschen möchten\n\t\t# ");
 	for (int i = 0; !exitReading; i++)
 	{
-		scanf("%s", toDeleteAsChar);
-
-		toDelete[i] = atoi(toDeleteAsChar);
+		scanf("%d", &toDelete[i]);
 
 		if (toDelete[i] < bankAccountLength)
 		{
@@ -115,8 +106,7 @@ void RemoveAccount()
 			printf("\t\t(%d) Bestätigen \n", 1);
 			printf("\t\t(%d) Wiederhole letzte Eingabe(%d)  \n\ ", 2, toDelete[i]);
 			printf("\t\t(%d) Nächster Datensatz löschen  \n\t\t# ", 3);
-			scanf("%s", decisionAsChar);
-			decision = atoi(decisionAsChar);
+			scanf("%d", &decision);
 
 			if (decision != 3)
 			{
@@ -147,24 +137,29 @@ void RemoveAccount()
 			system("cls");
 			printf(YEL"Datensatz mit dem Index (%d) nicht gefunden:\n\n" RESET, toDelete[i]);
 
-			int marked[1];
-			marked[0] = -1;
+			int marked[1] = {-1};
 			PrintList(&_BankAccountHead, marked, 1);
 		}
 	}
 
-	for (int i = 0; toDelete[i] > 0; i++)
+	for (int i = 0; toDelete[i] >= 0; i++)
 	{
 		// delete all marked index
 		deleteBankAccount(&_BankAccountHead, toDelete[i]);
 
+		int current = toDelete[i];
 		// decrease index by 1 when account has been deleted
-
-		for (int k = 0; toDelete[i] < toDelete[i + 1]; k++)
+		for (int k = 0; toDelete[i + k + 1] >= 0; k++)
 		{
-			toDelete[i + 1] = toDelete[i + 1]--;
-		}
+			// beginned mit dem index nach dem gelöschen
+			int next = toDelete[i + k + 1];
 
+			if (current < next)
+			{
+				// verringere den index des nachfolgers
+				toDelete[i + k + 1] = toDelete[i + k + 1]--;
+			}
+		}
 	}
 
 	if (toDelete[0] >= 0)
@@ -174,19 +169,19 @@ void RemoveAccount()
 	}
 
 	system("cls");
-	int marked[1];
-	marked[0] = -1;
+	int marked[1] = { -1 };
 	PrintList(&_BankAccountHead, marked, 1);
 }
 
 void CreateNewAccount(void)
 {
-	int current = GetArrayLength(&_BankAccountHead);
 	BankAccount* newBankAccount = CreateNode();
 	char birthDate[250];
 	char firstName[250];
 	char lastName[250];
+	int current = GetArrayLength(&_BankAccountHead);
 	int accountNumber;
+	system("cls");
 
 	printf("Bitte geben Sie Ihren Vornamen ein\n# ");
 	scanf("%s", firstName);
@@ -213,8 +208,7 @@ void CreateNewAccount(void)
 
 	// PrintList
 
-	int marked[1];
-	marked[0] = current;
+	int marked[1] = {current};
 	PrintList(&_BankAccountHead, marked, 1);
 
 	// Save in List
@@ -226,51 +220,46 @@ void CreateNewAccount(void)
 int OpenStartMenu()
 {
 	int choice = 0;
-	char choiceAsChar[5];
+	int marked[1] = { -1 };
 
 	printf(GRN"\n\n\t\t\t Willkommen in Ihrer Bank-Verwaltung \n\n\n" RESET);
 	while (1)
 	{
-		printf("\t 1.) Login\n");
-		printf("\t 2.) New Account\n");
-
-
-		printf("\t 5.) Remove Data\n");
-		printf("\t 6.) Close Application\n");
+		printf("\t 1.) New Account\n");
+		printf("\t 2.) Print List\n");
+		printf("\t 3.) Remove Data\n");
+		printf("\t 4.) Add Dummy Data\n");
+		printf("\t 5.) Close Application\n");
 
 		printf("\n\n\n\t Bitte waehlen Sie eine Option: ");
 
-		gets(choiceAsChar);
-		choice = atoi(choiceAsChar);
-
+		scanf("%d", &choice);
 		system("cls");
-		int marked[1];
-		marked[0] = -1;
-		PrintList(&_BankAccountHead, marked, 1);
 
 		switch (choice)
 		{
 		case 1:
-			//Login();
-			break;
-		case 2:
 			CreateNewAccount();
 			break;
+		case 2:
+			PrintList(&_BankAccountHead, marked, 1);
+			break;
 		case 3:
-
-			break;
-		case 4:
-			//see();
-			break;
-		case 5:
+			PrintList(&_BankAccountHead, marked, 1);
 			RemoveAccount();
 			break;
-		case 6:
+		case 4:
+			AddDummyData();
+			break;
+		case 5:
 			CloseApp();
 			return 1;
 			break;
+		case 6:
+
+			break;
 		case 7:
-			AddDummyData();
+			
 		default:
 			printf("\nBitte geben waehlen Sie eine Option zwischen 1 und 7\n\n");
 			break;
@@ -338,7 +327,7 @@ void LoadBankAccounts()
 			PushAtTheEnd(&_BankAccountHead, &newBankAccount);
 		}
 
-		printf(GRN"\t\t Daten erfolgreich geladen!\n" RESET);
+		//printf(GRN"\t\t Daten erfolgreich geladen!\n" RESET);
 	}
 	else
 	{
@@ -350,9 +339,8 @@ void LoadBankAccounts()
 		fclose(accountFile);
 	}
 
-	int marked[1];
-	marked[0] = -1;
-	PrintList(&_BankAccountHead, marked, 1);
+	//int marked[1] = { -1 };
+	//PrintList(&_BankAccountHead, marked, 1);
 
 	//free(marked);
 	free(buffer);

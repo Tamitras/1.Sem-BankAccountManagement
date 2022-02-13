@@ -146,7 +146,6 @@ void SaveListInFile(BankAccount** head)
 		printf("Neue Datei wurde angelegt\n");
 	}
 
-	printf(RED"\t\t Dummy Daten wurden generiert\n"RESET);
 	while (current != NULL) {
 
 		char* prevName = current->prev ? ((BankAccount*)current->prev)->FirstName : "NULL(void*)";
@@ -359,6 +358,7 @@ void AddDummyData()
 
 	// Save in File
 	SaveListInFile(&_BankAccountHead);
+	printf(RED"\t\t Dummy Daten wurden generiert\n"RESET);
 }
 
 BankAccount* CreateNode() {
@@ -406,6 +406,7 @@ int contains(int* array, int key, int len)
 
 void PrintList(BankAccount** head, int* toDelete, int arrayLen)
 {
+	int splitter = 0;
 	char* result = malloc(1024 * sizeof(char));
 	char* temp = malloc(1024 * sizeof(char));
 	char prevName[100];
@@ -452,9 +453,17 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen)
 		else
 			printf("%s\n", result);
 
+		splitter++;
+
+		if (splitter == 25)
+		{
+			system("pause");
+			splitter = 0;
+		}
 		current = current->next;
 	}
 
+	printf("\n\n");
 	free(result);
 	free(temp);
 }
