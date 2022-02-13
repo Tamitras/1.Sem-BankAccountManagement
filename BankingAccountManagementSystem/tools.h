@@ -21,7 +21,7 @@ typedef struct
 	struct Transaction* next;
 } Transaction;
 
-typedef struct
+typedef struct node
 {
 	char* FirstName;
 	char* LastName;
@@ -29,9 +29,10 @@ typedef struct
 	char* Adress;
 	char* LastLogin;
 	int AccountNumber;
-	//struct Transaction* Transaction;
+	struct Transaction* Transaction;
 	struct BankAccount* prev;
 	struct BankAccount* next;
+	int index;
 }BankAccount;
 
 #pragma once
@@ -39,13 +40,14 @@ void HoldTerminal();
 void PrintDatum();
 int IsNumber(char* string);
 int SeparateThousands(char* text);
+BankAccount* CreateNode();
+int GetAccountNumber(BankAccount** head);
+int GetArrayLength(BankAccount** head);
 void AddDummyData();
-void PushAtTheEnd(BankAccount** head, BankAccount** newAccount);
-void PrintList(BankAccount* n, int highlightNewest);
+void PushAtTheEnd(BankAccount** head, BankAccount** item);
+void PrintList(BankAccount** head, int toDelete);
 void remove_spaces(char* s);
-BankAccount CreateBankAccount();
-void SaveListInFile(BankAccount* head);
+void SaveListInFile(BankAccount** head);
 
-extern BankAccount* _BankAccountTail;
 extern BankAccount* _BankAccountHead;
-extern FILE* fStream;
+extern FILE* accountFile;
