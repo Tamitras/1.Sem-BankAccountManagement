@@ -85,56 +85,98 @@ void deleteBankAccount(BankAccount** head, int key)
 
 void RemoveAccount()
 {
-	int index = -1;
-	int decision = -1;
-	char indexAsChar[100];
-	char decisionAsChar[100];
+	int bankAccountLength = GetArrayLength(&_BankAccountHead);
 
-	int arrayLength = GetArrayLength(&_BankAccountHead);
+	int toDelete[20];
+	for (int i = 0; i < 20; i++)
+	{
+		toDelete[i] = -1;
+	}
+
+	char toDeleteAsChar[20];
+	int decision = -1;
+	int exitReading = 0;
+	char decisionAsChar[1000];
 
 	printf("\n\n\t\tWählen Sie einen Index den sie Löschen möchten\n\t\t# ");
-	scanf("%s", indexAsChar);
-	index = atoi(indexAsChar);
-
-	if (index < arrayLength)
+	for (int i = 0; !exitReading; i++)
 	{
-		system("cls");
-		PrintList(&_BankAccountHead, index);
+		scanf("%s", toDeleteAsChar);
 
-		printf("\n\n");
-		printf("\t\tAbbruch mit    (%d)\n", 0);
-		printf("\t\tBestätigen mit (%d)\n", 1);
-		printf("\t\tErneut wählen  (%d)\n\t\t# ", 2);
-		scanf("%s", decisionAsChar);
-		decision = atoi(decisionAsChar);
+		toDelete[i] = atoi(toDeleteAsChar);
 
-		if (decision != 0)
+		if (toDelete[i] < bankAccountLength)
 		{
-			if (decision == 2)
+			system("cls");
+			PrintList(&_BankAccountHead, toDelete, i + 1); // Index wird markiert
+
+			printf("\n\n");
+			printf("\t\t(%d) Abbruch    \n", 0);
+			printf("\t\t(%d) Bestätigen \n", 1);
+			printf("\t\t(%d) Wiederhole letzte Eingabe(%d)  \n\ ", 2, toDelete[i]);
+			printf("\t\t(%d) Nächster Datensatz löschen  \n\t\t# ", 3);
+			scanf("%s", decisionAsChar);
+			decision = atoi(decisionAsChar);
+
+			if (decision != 3)
 			{
-				system("cls");
-				RemoveAccount();
+				if (decision == 2)
+				{
+					i--;
+				}
+				else if (decision == 1)
+				{
+					exitReading = 1;
+				}
+				else
+				{
+					exitReading = 1;
+					for (int i = 0; i < 20; i++)
+					{
+						toDelete[i] = -1;
+					}
+				}
 			}
 			else
 			{
-				deleteBankAccount(&_BankAccountHead, index);
-				system("cls");
-				PrintList(&_BankAccountHead, -1);
-				SaveListInFile(&_BankAccountHead);
+				printf("\n\n\t\tWählen Sie einen weiteren Index den sie Löschen möchten\n\t\t# ");
 			}
 		}
 		else
 		{
 			system("cls");
+			printf(YEL"Datensatz mit dem Index (%d) nicht gefunden:\n\n" RESET, toDelete[i]);
+
+			int marked[1];
+			marked[0] = -1;
+			PrintList(&_BankAccountHead, marked, 1);
 		}
 	}
-	else
+
+	for (int i = 0; toDelete[i] > 0; i++)
 	{
-		system("cls");
-		printf(YEL"Datensatz mit dem Index (%d) nicht gefunden:\n\n" RESET, index);
-		PrintList(&_BankAccountHead, -1);
-		RemoveAccount();
+		// delete all marked index
+		deleteBankAccount(&_BankAccountHead, toDelete[i]);
+
+		// decrease index by 1 when account has been deleted
+
+		for (int k = 0; toDelete[i] < toDelete[i + 1]; k++)
+		{
+			toDelete[i + 1] = toDelete[i + 1]--;
+		}
+
 	}
+
+	if (toDelete[0] >= 0)
+	{
+		// only when index exist, save to file
+		SaveListInFile(&_BankAccountHead);
+	}
+
+	system("cls");
+	int marked[1];
+	marked[0] = -1;
+	PrintList(&_BankAccountHead, marked, 1);
 }
 
 void CreateNewAccount(void)
@@ -170,7 +212,10 @@ void CreateNewAccount(void)
 	PushAtTheEnd(&_BankAccountHead, &newBankAccount);
 
 	// PrintList
-	PrintList(&_BankAccountHead, current);
+
+	int marked[1];
+	marked[0] = current;
+	PrintList(&_BankAccountHead, marked, 1);
 
 	// Save in List
 	SaveListInFile(&_BankAccountHead);
@@ -199,7 +244,9 @@ int OpenStartMenu()
 		choice = atoi(choiceAsChar);
 
 		system("cls");
-		PrintList(&_BankAccountHead, -1);
+		int marked[1];
+		marked[0] = -1;
+		PrintList(&_BankAccountHead, marked, 1);
 
 		switch (choice)
 		{
@@ -303,11 +350,14 @@ void LoadBankAccounts()
 		fclose(accountFile);
 	}
 
+	int marked[1];
+	marked[0] = -1;
+	PrintList(&_BankAccountHead, marked, 1);
+
+	//free(marked);
 	free(buffer);
 	free(token2);
-	PrintList(&_BankAccountHead, -1);
 }
-
 
 void Initialize()
 {

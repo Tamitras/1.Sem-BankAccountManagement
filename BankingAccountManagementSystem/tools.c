@@ -394,7 +394,17 @@ void PushAtTheEnd(BankAccount** head, BankAccount** next) {
 	}
 }
 
-void PrintList(BankAccount** head, int toDelete)
+int contains(int* array, int key, int len)
+{
+	for (int i = 0; i < len; i++)
+	{
+		if (key == array[i])
+			return 1;
+	}
+	return 0;
+}
+
+void PrintList(BankAccount** head, int* toDelete, int arrayLen)
 {
 	char* result = malloc(1024 * sizeof(char));
 	char* temp = malloc(1024 * sizeof(char));
@@ -434,7 +444,9 @@ void PrintList(BankAccount** head, int toDelete)
 			nextName,
 			current->index);
 
-		if (current->index == toDelete)
+		int index = contains(toDelete, current->index, arrayLen);
+
+		if (index > 0)
 			//printf("%s"RED"<delete>"RESET"\head", result);
 			printf(RED"%s\n"RESET, result);
 		else
@@ -446,6 +458,8 @@ void PrintList(BankAccount** head, int toDelete)
 	free(result);
 	free(temp);
 }
+
+
 
 void remove_spaces(char* s)
 {

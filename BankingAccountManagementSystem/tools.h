@@ -45,7 +45,7 @@ int GetAccountNumber(BankAccount** head);
 int GetArrayLength(BankAccount** head);
 void AddDummyData();
 void PushAtTheEnd(BankAccount** head, BankAccount** item);
-void PrintList(BankAccount** head, int toDelete);
+void PrintList(BankAccount** head, int* toDelete, int arrayLen);
 void remove_spaces(char* s);
 void SaveListInFile(BankAccount** head);
 
