@@ -8,6 +8,13 @@
 #define RESET "\x1B[0m"
 
 typedef enum {
+	FirstName,
+	LastName,
+	AccountNumber,
+	Id
+}SortType;
+
+typedef enum {
 	Deposit,
 	Withdraw
 }TransactionType;
@@ -32,7 +39,7 @@ typedef struct node
 	struct Transaction* Transaction;
 	struct BankAccount* prev;
 	struct BankAccount* next;
-	int index;
+	int Id;
 }BankAccount;
 
 #pragma once
@@ -45,9 +52,10 @@ int GetAccountNumber(BankAccount** head);
 int GetArrayLength(BankAccount** head);
 void AddDummyData();
 void PushAtTheEnd(BankAccount** head, BankAccount** item);
-void PrintList(BankAccount** head, int* toDelete, int arrayLen);
+void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit);
 void remove_spaces(char* s);
 void SaveListInFile(BankAccount** head);
+void Sort(BankAccount** head, SortType type);
 
 extern BankAccount* _BankAccountHead;
 extern FILE* accountFile;

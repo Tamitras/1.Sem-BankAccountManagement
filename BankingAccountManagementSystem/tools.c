@@ -160,7 +160,7 @@ void SaveListInFile(BankAccount** head)
 			"Davor:%-14s;"
 			"Danach:%-14s"
 			"\n",
-			current->index,
+			current->Id,
 			current->FirstName,
 			current->LastName,
 			current->AccountNumber,
@@ -180,7 +180,7 @@ int GetArrayLength(BankAccount** head)
 	int counter = 0;
 	BankAccount* current = *head;
 
-	if (current != NULL && current->index >= 0)
+	if (current != NULL && current->Id >= 0)
 	{
 		counter = 1;
 
@@ -198,7 +198,7 @@ int GetAccountNumber(BankAccount** head)
 	BankAccount* current = *head;
 	int accountNumber = current->AccountNumber;
 
-	if (current != NULL && current->index >= 0)
+	if (current != NULL && current->Id >= 0)
 	{
 		while (current->next != NULL)
 		{
@@ -222,7 +222,7 @@ int GetAccountNumber(BankAccount** head)
 
 void AddDummyData()
 {
-	int index = GetArrayLength(&_BankAccountHead);
+	int Id = GetArrayLength(&_BankAccountHead);
 	BankAccount* acc1 = malloc(sizeof(BankAccount));
 	BankAccount* acc2 = malloc(sizeof(BankAccount));
 	BankAccount* acc3 = malloc(sizeof(BankAccount));
@@ -241,7 +241,7 @@ void AddDummyData()
 	acc1->Adress = "Testwohnort";
 	acc1->LastLogin = "11.02.2022";
 	acc1->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc1->index = index++;
+	acc1->Id = Id++;
 	acc1->next = NULL;
 	acc1->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc1);
@@ -253,7 +253,7 @@ void AddDummyData()
 	acc2->Adress = "Testwohnort";
 	acc2->LastLogin = "11.02.2022";
 	acc2->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc2->index = index++;
+	acc2->Id = Id++;
 	acc2->next = NULL;
 	acc2->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc2);
@@ -265,7 +265,7 @@ void AddDummyData()
 	acc3->Adress = "Testwohnort";
 	acc3->LastLogin = "11.02.2022";
 	acc3->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc3->index = index++;
+	acc3->Id = Id++;
 	acc3->next = NULL;
 	acc3->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc3);
@@ -277,7 +277,7 @@ void AddDummyData()
 	acc4->Adress = "Testwohnort";
 	acc4->LastLogin = "11.02.2022";
 	acc4->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc4->index = index++;
+	acc4->Id = Id++;
 	acc4->next = NULL;
 	acc4->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc4);
@@ -289,7 +289,7 @@ void AddDummyData()
 	acc5->Adress = "Testwohnort";
 	acc5->LastLogin = "11.02.2022";
 	acc5->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc5->index = index++;
+	acc5->Id = Id++;
 	acc5->next = NULL;
 	acc5->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc5);
@@ -301,7 +301,7 @@ void AddDummyData()
 	acc6->Adress = "Testwohnort";
 	acc6->LastLogin = "11.02.2022";
 	acc6->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc6->index = index++;
+	acc6->Id = Id++;
 	acc6->next = NULL;
 	acc6->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc6);
@@ -313,7 +313,7 @@ void AddDummyData()
 	acc7->Adress = "Testwohnort";
 	acc7->LastLogin = "11.02.2022";
 	acc7->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc7->index = index++;
+	acc7->Id = Id++;
 	acc7->next = NULL;
 	acc7->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc7);
@@ -325,7 +325,7 @@ void AddDummyData()
 	acc8->Adress = "Testwohnort";
 	acc8->LastLogin = "11.02.2022";
 	acc8->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc8->index = index++;
+	acc8->Id = Id++;
 	acc8->next = NULL;
 	acc8->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc8);
@@ -337,7 +337,7 @@ void AddDummyData()
 	acc9->Adress = "Testwohnort";
 	acc9->LastLogin = "11.02.2022";
 	acc9->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc9->index = index++;
+	acc9->Id = Id++;
 	acc9->next = NULL;
 	acc9->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc9);
@@ -349,7 +349,7 @@ void AddDummyData()
 	acc10->Adress = "Testwohnort";
 	acc10->LastLogin = "11.02.2022";
 	acc10->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	acc10->index = index++;
+	acc10->Id = Id++;
 	acc10->next = NULL;
 	acc10->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc10);
@@ -367,6 +367,86 @@ BankAccount* CreateNode() {
 	return newNode;
 }
 
+/*Function to swap the nodes */
+BankAccount* swap(BankAccount* ptr1, BankAccount* ptr2)
+{
+	// Hilfspointer
+	BankAccount* A = ptr1->prev;
+	BankAccount* B = ptr1;
+	BankAccount* C = ptr2;
+	BankAccount* D = ptr2->next;
+
+	// Swapping
+	if (A)
+		A->next = C;
+	B->prev = C;
+	B->next = D;
+	C->prev = A;
+	C->next = B;
+	if (D)
+		D->prev = B;
+
+	return ptr2;
+}
+
+void Sort(BankAccount** head, SortType type)
+{
+	int marked[1] = { -1 };
+	int count = GetArrayLength(&_BankAccountHead);
+	BankAccount** h;
+	int i, j, swapped;
+
+	for (i = 0; i <= count; i++) {
+
+		h = head;
+		swapped = 0;
+
+		for (j = 0; j < count - i - 1; j++) {
+
+			BankAccount* p1 = *h;
+			BankAccount* p2 = p1->next;
+
+			switch (type)
+			{
+			case FirstName:
+				if (strcmp(p1->FirstName, p2->FirstName) > 0) {
+					*h = swap(p1, p2);
+					swapped = 1;
+				}
+				break;
+			case LastName:
+				if (strcmp(p1->LastName, p2->LastName) > 0) {
+					*h = swap(p1, p2);
+					swapped = 1;
+				}
+				break;
+			case AccountNumber:
+				if (p1->AccountNumber > p2->AccountNumber) {
+					*h = swap(p1, p2);
+					swapped = 1;
+				}
+				break;
+			case Id:
+				if (p1->Id > p2->Id) {
+					*h = swap(p1, p2);
+					swapped = 1;
+				}
+				break;
+			default:
+				break;
+			}
+
+			h = &(*h)->next;
+		}
+
+		/* break if the loop ended without any swap */
+		if (swapped == 0)
+			break;
+	}
+	SaveListInFile(&_BankAccountHead);
+	PrintList(&_BankAccountHead, marked, 1, 25);
+}
+
 /// <summary>
 /// Add to the end
 /// </summary>
@@ -376,7 +456,8 @@ void PushAtTheEnd(BankAccount** head, BankAccount** next) {
 
 	BankAccount* current = *head;
 
-	if (current->index == -1)
+
+	if (current->Id == -1)
 	{
 		(*next)->next = NULL;
 		(*next)->prev = NULL;
@@ -404,30 +485,36 @@ int contains(int* array, int key, int len)
 	return 0;
 }
 
-void PrintList(BankAccount** head, int* toDelete, int arrayLen)
+
+
+void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
 {
-	int splitter = 0;
+	int limitCounter = 0;
 	char* result = malloc(1024 * sizeof(char));
 	char* temp = malloc(1024 * sizeof(char));
-	char prevName[100];
-	char nextName[100];
+	char* prevName = malloc(100 * sizeof(char));
+	char* nextName = malloc(100 * sizeof(char));
 
 	BankAccount* current = *head;
 
-	while (current && current->index > -1)
+	while (current && current->Id > -1)
 	{
 		BankAccount* prev = current->prev;
 		BankAccount* next = current->next;
 
 		if (prev)
-			strcpy(prevName, prev->FirstName);
+			//strcpy(prevName, prev->FirstName);
+			prevName = _strdup(prev->FirstName);
 		else
-			strcpy(prevName, "NULL(void*)");
+			//strcpy(prevName, "NULL(void*)");
+			prevName = _strdup("NULL(void*)");
 
 		if (next)
-			strcpy(nextName, next->FirstName);
+			//strcpy(nextName, next->FirstName);
+			nextName = _strdup(next->FirstName);
 		else
-			strcpy(nextName, "NULL(void*)");
+			//strcpy(nextName, "NULL(void*)");
+			nextName = _strdup("NULL(void*)");
 
 		snprintf(result,
 			1024,
@@ -443,22 +530,22 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen)
 			current->AccountNumber,
 			prevName,
 			nextName,
-			current->index);
+			current->Id);
 
-		int index = contains(toDelete, current->index, arrayLen);
+		int Id = contains(toDelete, current->Id, arrayLen);
 
-		if (index > 0)
+		if (Id > 0)
 			//printf("%s"RED"<delete>"RESET"\head", result);
 			printf(RED"%s\n"RESET, result);
 		else
 			printf("%s\n", result);
 
-		splitter++;
+		limitCounter++;
 
-		if (splitter == 25)
+		if (limit > 0 && limitCounter == limit)
 		{
 			system("pause");
-			splitter = 0;
+			limitCounter = 0;
 		}
 		current = current->next;
 	}
