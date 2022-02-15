@@ -9,6 +9,7 @@
 #define WHT			"\x1B[37m"
 #define RESET		"\x1B[0m"
 
+// Sorting type
 typedef enum {
 	FirstName,
 	LastName,
@@ -16,11 +17,13 @@ typedef enum {
 	Id
 }SortType;
 
+// TransactionType
 typedef enum {
 	Deposit,
 	Withdraw
 }TransactionType;
 
+// Transaction model
 typedef struct
 {
 	TransactionType type;
@@ -30,7 +33,8 @@ typedef struct
 	struct Transaction* next;
 } Transaction;
 
-typedef struct node
+// Bankaccount model
+typedef struct
 {
 	char* FirstName;
 	char* LastName;
@@ -46,6 +50,7 @@ typedef struct node
 #pragma once
 void HoldTerminal();
 void PrintDatum();
+void freeArray(BankAccount** head);
 int IsNumber(char* string);
 int SeparateThousands(char* text);
 BankAccount* CreateNode();
@@ -59,5 +64,6 @@ void remove_spaces(char* s);
 void SaveListInFile(BankAccount** head);
 void Sort(BankAccount** head, SortType type);
 
+// external variables
 extern BankAccount* _BankAccountHead;
 extern FILE* accountFile;

@@ -5,19 +5,19 @@
 #include <string.h>
 #include "tools.h"
 
-// Head of List
-BankAccount* _BankAccountHead;
+BankAccount* _BankAccountHead;		// Head of List
 
 // FilePointer
 FILE* accountFile;
-FILE* accountPasswordFile;
-FILE* accountTransactionFile;
+FILE* accountPasswordFile;			// not used
+FILE* accountTransactionFile;		// not used
 
 void CloseApp(void)
 {
 	system("cls");
 	printf(GRN"\n\n\t\tVielen Dank f%sr Ihren Besuch"RESET"\n\n", "\x81");
 	fflush(stdout);
+
 	for (int i = 5; i != 0; i--)
 	{
 		printf(WHT"\r\t\tSie werden in     "MAG" %d"RESET"     Sekunden automatisch ausgeloggt.", i);
@@ -33,13 +33,12 @@ void DeleteBankAccount(BankAccount** head, int key)
 	// Store head node
 	BankAccount* temp = *head;
 	BankAccount* prev = NULL;
-	BankAccount* idPtr = NULL;
 
 	// If head node itself holds the key to be deleted
 	if (temp != NULL && temp->Id == key) {
-		*head = temp->next; // Changed head
-		(*head)->prev = NULL;
-		free(temp); // free old head
+		*head = temp->next;		// Changed head
+		(*head)->prev = NULL;	// Set heads prev to null pointer
+		free(temp);				// free old head
 		return;
 	}
 
@@ -57,11 +56,9 @@ void DeleteBankAccount(BankAccount** head, int key)
 	// Unlink the node from linked list
 	prev->next = temp->next;
 	if (((BankAccount*)temp->next) != NULL)
-	{
 		((BankAccount*)temp->next)->prev = prev;
-	}
 
-	free(temp); // Free memory
+	free(temp); // Deallocate memory
 }
 
 void RemoveAccount()
@@ -92,9 +89,7 @@ void RemoveAccount()
 			}
 		}
 		else
-		{
 			validDecision = 1;
-		}
 
 		if (tempDecision > 0 && contains(toDelete, tempDecision, 10))
 		{
@@ -102,25 +97,22 @@ void RemoveAccount()
 			i--;
 			system("pause");
 			system("cls");
-			PrintList(&_BankAccountHead, toDelete, i+1, -1);
+			PrintList(&_BankAccountHead, toDelete, i + 1, -1);
 		}
 		else
 		{
 			if (tempDecision != -1)
-			{
 				toDelete[i] = tempDecision;
-			}
 
 			if (toDelete[i] <= bankAccountLength)
 			{
 				system("cls");
-				PrintList(&_BankAccountHead, toDelete, i+1, -1); // Index wird markiert
+				PrintList(&_BankAccountHead, toDelete, i + 1, -1); // mark index
 
 				printf("\n\n");
 				printf("\t\t(%d) Abbruch    \n", 0);
 				printf("\t\t(%d) Best\%stigen \n", 1, "\x84");
 				printf("\t\t(%d) Wiederhole letzte Eingabe (%d)  \n ", 2, toDelete[i]);
-
 				printf("\t\t(%d) N%schster Datensatz l%sschen  \n\t\t# ", 3, "\x84", "\x94");
 				scanf("%d", &decision);
 
@@ -128,8 +120,8 @@ void RemoveAccount()
 				{
 					if (decision == 2)
 					{
-						retry = 1; // mark as retry
-						toDelete[i] = tempDecision= -1; // remove last index
+						retry = 1;							// mark as retry
+						toDelete[i] = tempDecision = -1;	// remove last index
 						i--;
 						system("cls");
 						PrintList(&_BankAccountHead, toDelete, i + 1, -1);
@@ -169,16 +161,10 @@ void RemoveAccount()
 
 	// Multi-Deleting
 	for (int i = 0; toDelete[i] >= 0; i++)
-	{
-		// delete all marked index
-		DeleteBankAccount(&_BankAccountHead, toDelete[i]);
-	}
+		DeleteBankAccount(&_BankAccountHead, toDelete[i]);		// delete all marked index
 
 	if (toDelete[0] >= 0)
-	{
-		// only if index exist, save to file
-		SaveListInFile(&_BankAccountHead);
-	}
+		SaveListInFile(&_BankAccountHead);						// only if index exist, save to file
 
 	system("cls");
 	PrintList(&_BankAccountHead, marked, 1, -1);
@@ -209,14 +195,14 @@ void CreateNewAccount(void)
 	newBankAccount->Id = id;
 	system("cls");
 
-	// Add To List
-	PushAtTheEnd(&_BankAccountHead, &newBankAccount);
 
-	// PrintList
-	PrintList(&_BankAccountHead, marked, 1, 25);
+	PushAtTheEnd(&_BankAccountHead, &newBankAccount);			// Add To List
 
-	// Save in List
-	SaveListInFile(&_BankAccountHead);
+
+	PrintList(&_BankAccountHead, marked, 1, 25);				// PrintList
+
+
+	SaveListInFile(&_BankAccountHead);							// Save in List
 }
 
 int OpenStartMenu()
@@ -238,38 +224,38 @@ int OpenStartMenu()
 		printf("\t 9.) Close Application\n");
 		printf("\n\n\n\t Please choose an option: ");
 
-		scanf("%d", &choice);
-		system("cls");
+		scanf("%d", &choice);									// waiting for user input
+		system("cls");											// clears console
 
 		switch (choice)
 		{
 		case 1:
-			CreateNewAccount();
+			CreateNewAccount();									// Creates a new account
 			break;
 		case 2:
-			PrintList(&_BankAccountHead, marked, 1, 25);
+			PrintList(&_BankAccountHead, marked, 1, 25);		// Print list on terminal
 			break;
 		case 3:
 			PrintList(&_BankAccountHead, marked, 1, -1);
-			RemoveAccount();
+			RemoveAccount();									// Remove Accounts from heap and file
 			break;
 		case 4:
-			AddDummyData();
+			AddDummyData();										// Adding dummy data
 			break;
 		case 5:
-			Sort(&_BankAccountHead, FirstName);
+			Sort(&_BankAccountHead, FirstName);					// Sort by Firstname
 			break;
 		case 6:
-			Sort(&_BankAccountHead, LastName);
+			Sort(&_BankAccountHead, LastName);					// Sort by Lastname
 			break;
 		case 7:
-			Sort(&_BankAccountHead, AccountNumber);
+			Sort(&_BankAccountHead, AccountNumber);				// Sort by Accountnumber
 			break;
 		case 8:
-			Sort(&_BankAccountHead, Id);
+			Sort(&_BankAccountHead, Id);						// Sort by Id
 			break;
 		case 9:
-			CloseApp();
+			CloseApp();											// Close Application
 			return 1;
 			break;
 		default:
@@ -283,26 +269,27 @@ void LoadBankAccounts()
 {
 	int bufferLength = 255;
 	char* token2 = malloc(bufferLength * sizeof(char));
+	char* _token2 = malloc(bufferLength * sizeof(char));
 	char* buffer = malloc(bufferLength * sizeof(char));
 	char* next_token1 = NULL;
 	char* next_token2 = NULL;
 	int i = 0;
 
-	// Datei oeffnen
+	// Open File (read)
 	accountFile = fopen("accounts.txt", "r");
 
 	if (accountFile != NULL)
 	{
-		while (fgets(buffer, bufferLength, accountFile))
+		while (fgets(buffer, bufferLength, accountFile))			// Read line by line
 		{
-			BankAccount* newBankAccount = CreateNode();
-			i++;
+			BankAccount* newBankAccount = CreateNode();				// Create new BankAccount
 			remove_spaces(buffer);									// Remove whitespace from buffer
 			char* token1 = strtok_s(buffer, ";", &next_token1);		// Separation by ';'
+			i++;
 
-			while (token1 != NULL) {
-
-				char* _token2 = strtok_s(token1, ":", &next_token2);
+			while (token1 != NULL)
+			{
+				_token2 = strtok_s(token1, ":", &next_token2);
 				token2 = _strdup(_token2);							// duplicate value (new ref)
 
 				// Key
@@ -333,21 +320,14 @@ void LoadBankAccounts()
 
 				token1 = strtok_s(NULL, ";", &next_token1);
 			}
-
 			PushAtTheEnd(&_BankAccountHead, &newBankAccount);
 		}
-
-		//printf(GRN"\t\t Daten erfolgreich geladen!\n" RESET);
 	}
 	else
-	{
 		printf(RED"\t\t Datenbank Datei konnte nicht geöffnet werden\n" RESET);
-	}
 
 	if (accountFile != NULL)
-	{
 		fclose(accountFile);
-	}
 
 	free(buffer);
 	free(token2);
@@ -355,23 +335,7 @@ void LoadBankAccounts()
 
 void Initialize()
 {
-	LoadBankAccounts();
-}
-
-void freeArray(BankAccount** head)
-{
-	BankAccount* current = *head;
-	BankAccount* temp = NULL;
-
-	while (current != NULL)
-	{
-		temp = current->next;
-		free(current);
-		current = temp;
-	}
-
-	free(current);
-	free(temp);
+	LoadBankAccounts();						// Loads data from file, filling heap
 }
 
 int main(int argc, char* argv[])
@@ -379,13 +343,8 @@ int main(int argc, char* argv[])
 	_BankAccountHead = malloc(sizeof(BankAccount));
 	_BankAccountHead->Id = -1;
 
-	if (argc > 0) {
-		// lese arg 1 ein
-	}
-
-	if (argc > 1) {
-		// lese arg 1 ein
-	}
+	if (argc > 0) { /*read arg1*/ }
+	if (argc > 1) {	/*read arg2*/ }
 
 	Initialize();
 	OpenStartMenu();

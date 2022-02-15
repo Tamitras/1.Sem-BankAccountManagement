@@ -19,6 +19,16 @@ void initMultiArray(char** p, int m, int n)
 	}
 }
 
+void remove_spaces(char* s)
+{
+	char* d = s;
+	do {
+		while (*d == ' ') {
+			++d;
+		}
+	} while (*s++ = *d++);
+}
+
 // Private End
 
 // Public Start
@@ -138,7 +148,8 @@ int SeparateThousands(char* text)
 void SaveListInFile(BankAccount** head)
 {
 	BankAccount* current = *head;
-	// Datei oeffnen
+
+	// Open file
 	accountFile = fopen("accounts.txt", "wb");
 
 	if (accountFile == NULL) {
@@ -278,8 +289,8 @@ void AddDummyData()
 	acc1->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc1);
 
-	acc2->FirstName = "Pascal";
-	acc2->LastName = "Lorenz";
+	acc2->FirstName = "Brad";
+	acc2->LastName = "Pitt";
 	acc2->AccountNumber = "99999";
 	acc2->Adress = "Testwohnort";
 	acc2->LastLogin = "11.02.2022";
@@ -289,8 +300,8 @@ void AddDummyData()
 	acc2->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc2);
 
-	acc3->FirstName = "Lukas";
-	acc3->LastName = "Haaf";
+	acc3->FirstName = "Arnold";
+	acc3->LastName = "Schwarzenegger";
 	acc3->AccountNumber = "99999";
 	acc3->Adress = "Testwohnort";
 	acc3->LastLogin = "11.02.2022";
@@ -323,7 +334,7 @@ void AddDummyData()
 	PushAtTheEnd(&_BankAccountHead, &acc5);
 
 	acc6->FirstName = "Freddy";
-	acc6->LastName = "Krüger";
+	acc6->LastName = "Krueger";
 	acc6->AccountNumber = "99999";
 	acc6->Adress = "Testwohnort";
 	acc6->LastLogin = "11.02.2022";
@@ -333,8 +344,8 @@ void AddDummyData()
 	acc6->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc6);
 
-	acc7->FirstName = "Osama";
-	acc7->LastName = "Binladen";
+	acc7->FirstName = "Angelo";
+	acc7->LastName = "Merte";
 	acc7->AccountNumber = "99999";
 	acc7->Adress = "Testwohnort";
 	acc7->LastLogin = "11.02.2022";
@@ -366,8 +377,8 @@ void AddDummyData()
 	acc9->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc9);
 
-	acc10->FirstName = "Liselotte";
-	acc10->LastName = "Schutte";
+	acc10->FirstName = "Veronika";
+	acc10->LastName = "Poth";
 	acc10->AccountNumber = "99999";
 	acc10->Adress = "Testwohnort";
 	acc10->LastLogin = "11.02.2022";
@@ -377,10 +388,9 @@ void AddDummyData()
 	acc10->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc10);
 
-
 	// Save in File
 	SaveListInFile(&_BankAccountHead);
-	printf(RED"\t\t Dummy Daten wurden generiert\n"RESET);
+	printf(RED"\t\t Created dummy data successfully\n"RESET);
 }
 
 BankAccount* CreateNode() {
@@ -389,7 +399,12 @@ BankAccount* CreateNode() {
 	return newNode;
 }
 
-/*Function to swap the nodes */
+/// <summary>
+/// Function to swap pointers
+/// </summary>
+/// <param name="ptr1"></param>
+/// <param name="ptr2"></param>
+/// <returns></returns>
 BankAccount* swap(BankAccount* ptr1, BankAccount* ptr2)
 {
 	// Hilfspointer
@@ -479,7 +494,6 @@ void PushAtTheEnd(BankAccount** head, BankAccount** next) {
 
 	BankAccount* current = *head;
 
-
 	if (current->Id == -1)
 	{
 		(*next)->next = NULL;
@@ -533,11 +547,7 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
 		else
 			nextName = _strdup("NULL(void*)");
 
-		
-
-		int Id = contains(toDelete, current->Id, arrayLen);
-
-		if (Id > 0)
+		if (contains(toDelete, current->Id, arrayLen) > 0)
 		{
 			snprintf(result,
 				1024,
@@ -556,9 +566,25 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
 		}
 		else
 		{
-			snprintf(result, 1024, YEL" (%d)"RESET CYN"\tVorname: "RESET"%-15s"BLK";"RESET CYN"Nachname: "RESET"%-15s"BLK";"RESET CYN"KontoNummer: "RESET"%-15d"BLK";"RESET
-				CYN"Davor: "RESET"%-15s"BLK";"RESET CYN"Danach: "RESET"%-15s", current->Id, current->FirstName, current->LastName,
-				current->AccountNumber, prevName, nextName);
+			snprintf(result,
+				1024,
+				YEL" (%d)"RESET
+				CYN"\tVorname: "RESET
+				"%-15s"BLK";"RESET
+				CYN"Nachname: "RESET
+				"%-15s"BLK";"RESET
+				CYN"KontoNummer: "RESET
+				"%-15d"BLK";"RESET
+				CYN"Davor: "RESET
+				"%-15s"BLK";"RESET
+				CYN"Danach: "RESET
+				"%-15s",
+				current->Id,
+				current->FirstName,
+				current->LastName,
+				current->AccountNumber,
+				prevName,
+				nextName);
 			printf("%s\n", result);
 		}
 
@@ -577,14 +603,17 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
 	free(temp);
 }
 
-
-void remove_spaces(char* s)
+void freeArray(BankAccount** head)
 {
-	char* d = s;
-	do {
-		while (*d == ' ') {
-			++d;
-		}
-	} while (*s++ = *d++);
+	BankAccount* current = *head;
+	BankAccount* temp = NULL;
+
+	while (current != NULL)
+	{
+		temp = current->next;
+		free(current);
+		current = temp;
+	}
 }
+
 // Public End
