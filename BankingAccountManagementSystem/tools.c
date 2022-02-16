@@ -149,6 +149,14 @@ void SaveListInFile(BankAccount** head)
 {
 	BankAccount* current = *head;
 
+	if (current == NULL)
+	{
+		printf(RED "\n\Fehler! Liste ist leer - Datei kann nicht %sberschrieben werden \n\n" RESET, "\x81");
+		system("pause");
+		system("cls");
+		return 0;
+	}
+
 	// Open file
 	accountFile = fopen("accounts.txt", "wb");
 
@@ -183,6 +191,10 @@ void SaveListInFile(BankAccount** head)
 	}
 
 	fclose(accountFile);
+
+	printf(GRN"\t\Daten wurden erfolgreich in Datei geschrieben"RESET"\n\n");
+	system("pause");
+	system("cls");
 }
 
 int GetArrayLength(BankAccount** head)
@@ -200,6 +212,7 @@ int GetArrayLength(BankAccount** head)
 			counter++;
 		}
 	}
+
 	return counter;
 }
 
@@ -390,7 +403,7 @@ void AddDummyData()
 
 	// Save in File
 	SaveListInFile(&_BankAccountHead);
-	printf(RED"\t\t Created dummy data successfully\n"RESET);
+	printf(RED"\t\t Testdaten erstellt\n"RESET);
 }
 
 BankAccount* CreateNode() {
@@ -432,11 +445,19 @@ void Sort(BankAccount** head, SortType type)
 	int count = GetArrayLength(&_BankAccountHead);
 	BankAccount** h;
 	int i, j, swapped;
+	char* sortTypeAsString = malloc(100 * sizeof(char));
+
+	if (*head == NULL)
+	{
+		return 0;
+	}
 
 	for (i = 0; i <= count; i++) {
 
 		h = head;
 		swapped = 0;
+
+		strcpy(sortTypeAsString, "");
 
 		for (j = 0; j < count - i - 1; j++) {
 
@@ -450,24 +471,28 @@ void Sort(BankAccount** head, SortType type)
 					*h = swap(p1, p2);
 					swapped = 1;
 				}
+				strcpy(sortTypeAsString, "Vorname");
 				break;
 			case LastName:
 				if (strcmp(p1->LastName, p2->LastName) > 0) {
 					*h = swap(p1, p2);
 					swapped = 1;
 				}
+				strcpy(sortTypeAsString, "Nachname");
 				break;
 			case AccountNumber:
 				if (p1->AccountNumber > p2->AccountNumber) {
 					*h = swap(p1, p2);
 					swapped = 1;
 				}
+				strcpy(sortTypeAsString, "Kontonummer");
 				break;
 			case Id:
 				if (p1->Id > p2->Id) {
 					*h = swap(p1, p2);
 					swapped = 1;
 				}
+				strcpy(sortTypeAsString, "Id");
 				break;
 			default:
 				break;
@@ -480,9 +505,11 @@ void Sort(BankAccount** head, SortType type)
 		if (swapped == 0)
 			break;
 	}
-	SaveListInFile(&_BankAccountHead);
-	printf(GRN"\t\t Sorted successfully\n\n" RESET);
+
+	printf(GRN"\t\t Erfolgreich sortiert (%s)\n\n" RESET, sortTypeAsString);
 	PrintList(&_BankAccountHead, marked, 1, 25);
+
+	free(sortTypeAsString);
 }
 
 /// <summary>
@@ -490,7 +517,14 @@ void Sort(BankAccount** head, SortType type)
 /// </summary>
 /// <param name="head"></param>
 /// <param name="val"></param>
-void PushAtTheEnd(BankAccount** head, BankAccount** next) {
+void PushAtTheEnd(BankAccount** head, BankAccount** next) 
+{
+	if (_BankAccountHead == NULL)
+	{
+		_BankAccountHead = malloc(sizeof(BankAccount));
+		_BankAccountHead->Id = -1;
+		*head = _BankAccountHead;
+	}
 
 	BankAccount* current = *head;
 
@@ -512,13 +546,34 @@ void PushAtTheEnd(BankAccount** head, BankAccount** next) {
 	}
 }
 
-int contains(int* array, int key, int len)
+int containsInIntArray(int* array, int key, int len)
 {
 	for (int i = 0; i < len; i++)
 	{
 		if (key == array[i])
 			return 1;
 	}
+	return 0;
+}
+
+int contains(int key)
+{
+	BankAccount* current = _BankAccountHead;
+
+	if (current != NULL && current->Id >= 0)
+	{
+		for (int i = 1; i < 100000; i++)
+		{
+			while (current)
+			{
+				if (current->Id == key)
+					return 1;
+
+				current = current->next;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -532,7 +587,7 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
 
 	BankAccount* current = *head;
 
-	while (current && current->Id > -1)
+	while (current != NULL && current->Id > -1)
 	{
 		BankAccount* prev = current->prev;
 		BankAccount* next = current->next;
@@ -547,7 +602,7 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
 		else
 			nextName = _strdup("NULL(void*)");
 
-		if (contains(toDelete, current->Id, arrayLen) > 0)
+		if (containsInIntArray(toDelete, current->Id, arrayLen) > 0)
 		{
 			snprintf(result,
 				1024,
@@ -598,7 +653,7 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
 		current = current->next;
 	}
 
-	printf("\n\n");
+	//printf("\n\n");
 	free(result);
 	free(temp);
 }

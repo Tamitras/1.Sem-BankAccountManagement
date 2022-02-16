@@ -5,12 +5,12 @@
 #include <string.h>
 #include "tools.h"
 
-BankAccount* _BankAccountHead;		// Head of List
+BankAccount* _BankAccountHead;			// Head of List
 
 // FilePointer
 FILE* accountFile;
-FILE* accountPasswordFile;			// not used
-FILE* accountTransactionFile;		// not used
+//FILE* accountPasswordFile;			// not used
+//FILE* accountTransactionFile;			// not used
 
 void CloseApp(void)
 {
@@ -63,7 +63,6 @@ void DeleteBankAccount(BankAccount** head, int key)
 
 void RemoveAccount()
 {
-	int bankAccountLength = GetArrayLength(&_BankAccountHead);
 	int validDecision = 1;
 	int toDelete[10] = { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
 	int decision = -1;
@@ -72,40 +71,41 @@ void RemoveAccount()
 	int tempDecision = 0;
 	int retry = 0;
 
-	for (int i = 0; !exitReading; i++)
+	PrintList(&_BankAccountHead, marked, 1, -1);
+
+	if (GetArrayLength(&_BankAccountHead) > 0) // Daten zum Löschen vorhanden
 	{
-		if (validDecision == 1)
+		for (int i = 0; !exitReading; i++)
 		{
-			if (!retry || i == 0)
+			if (validDecision == 1)
 			{
-				retry = 0;
-				printf("\n\n\t\tW%shlen Sie einen Datensatz aus (ID) den sie L%sschen m%schten\n\t\t# ", "\x84", "\x94", "\x94");
-				scanf("%d", &tempDecision);
+				if (!retry || i == 0)
+				{
+					retry = 0;
+					printf("\n\n\t\tW%shlen Sie einen Datensatz aus (ID) den sie L%sschen m%schten\n\t\t# ", "\x84", "\x94", "\x94");
+					scanf("%d", &tempDecision);
+				}
+				else
+				{
+					retry = 0;
+					i--;
+				}
 			}
 			else
-			{
-				retry = 0;
-				i--;
-			}
-		}
-		else
-			validDecision = 1;
+				validDecision = 1;
 
-		if (tempDecision > 0 && contains(toDelete, tempDecision, 10))
-		{
-			printf(YEL"\n\t\tDatensatz mit dem Index (%d) wurde bereits zur löschen Liste hinzugefügt:\n\n" RESET, tempDecision);
-			i--;
-			system("pause");
-			system("cls");
-			PrintList(&_BankAccountHead, toDelete, i + 1, -1);
-		}
-		else
-		{
-			if (tempDecision != -1)
+			if (tempDecision > 0 && containsInIntArray(toDelete, tempDecision, 10)) // still in list (to delete)
+			{
+				printf(YEL"\n\t\tDatensatz mit dem Index (%d) wurde bereits zur L%sschen Liste hinzugef%sgt:\n\n" RESET, tempDecision, "\x94", "\x81");
+				i--;
+				system("pause");
+				system("cls");
+				PrintList(&_BankAccountHead, toDelete, i + 1, -1);
+			}
+			else if (tempDecision > 0 && contains(tempDecision))
+			{
 				toDelete[i] = tempDecision;
 
-			if (toDelete[i] <= bankAccountLength)
-			{
 				system("cls");
 				PrintList(&_BankAccountHead, toDelete, i + 1, -1); // mark index
 
@@ -158,109 +158,65 @@ void RemoveAccount()
 			}
 		}
 	}
+	else
+	{
+		printf(RED "\n\tEs sind noch keine Daten im Speicher vorhanden, bitte erstellen Sie oder Laden aus der Datei\n\n" RESET);
+		system("pause");
+	}
+
 
 	// Multi-Deleting
 	for (int i = 0; toDelete[i] >= 0; i++)
 		DeleteBankAccount(&_BankAccountHead, toDelete[i]);		// delete all marked index
 
-	if (toDelete[0] >= 0)
-		SaveListInFile(&_BankAccountHead);						// only if index exist, save to file
-
 	system("cls");
-	PrintList(&_BankAccountHead, marked, 1, -1);
 }
 
 void CreateNewAccount(void)
 {
-	BankAccount* newBankAccount = CreateNode();
-	char firstName[250], lastName[250];
+	int createNew = 1;
 
-	int id = GetNewId(&_BankAccountHead);
-	int marked[1] = { id };
-	int accountNumber;
-	system("cls");
-
-	printf("Bitte geben Sie Ihren Vornamen ein\n# ");
-	scanf("%s", firstName);
-	system("cls");
-
-	printf("Bitte geben Sie Ihren Nachnamen ein\n# ");
-	scanf("%s", lastName);
-	system("cls");
-
-	newBankAccount->FirstName = _strdup(firstName);
-	newBankAccount->LastName = _strdup(lastName);
-	newBankAccount->AccountNumber = GetAccountNumber(&_BankAccountHead);
-	newBankAccount->next = NULL;
-	newBankAccount->Id = id;
-	system("cls");
-
-
-	PushAtTheEnd(&_BankAccountHead, &newBankAccount);			// Add To List
-
-
-	PrintList(&_BankAccountHead, marked, 1, 25);				// PrintList
-
-
-	SaveListInFile(&_BankAccountHead);							// Save in List
-}
-
-int OpenStartMenu()
-{
-	int choice = 0;
-	int marked[1] = { -1 };
-
-	printf(GRN"\n\n\t\t\t Willkommen in Ihrer Bank-Verwaltung \n\n\n" RESET);
-	while (1)
+	while (createNew)
 	{
-		printf("\t 1.) New Account\n");
-		printf("\t 2.) Print List\n");
-		printf("\t 3.) Remove Data\n");
-		printf("\t 4.) Add Dummy Data\n");
-		printf("\t 5.) Sort By FirstName\n");
-		printf("\t 6.) Sort By LastName\n");
-		printf("\t 7.) Sort By AccountNumber\n");
-		printf("\t 8.) Sort By Id\n");
-		printf("\t 9.) Close Application\n");
-		printf("\n\n\n\t Please choose an option: ");
+		BankAccount* newBankAccount = CreateNode();
+		char firstName[250], lastName[250];
 
-		scanf("%d", &choice);									// waiting for user input
-		system("cls");											// clears console
+		int id = GetNewId(&_BankAccountHead);
+		int marked[1] = { id };
+		int accountNumber;
+		system("cls");
 
-		switch (choice)
+		printf("Bitte geben Sie Ihren Vornamen ein\n# ");
+		scanf("%s", firstName);
+		system("cls");
+
+		printf("Bitte geben Sie Ihren Nachnamen ein\n# ");
+		scanf("%s", lastName);
+		system("cls");
+
+		newBankAccount->FirstName = _strdup(firstName);
+		newBankAccount->LastName = _strdup(lastName);
+		newBankAccount->AccountNumber = GetAccountNumber(&_BankAccountHead);
+		newBankAccount->next = NULL;
+		newBankAccount->Id = id;
+		system("cls");
+
+		PushAtTheEnd(&_BankAccountHead, &newBankAccount);			// Add To List
+		PrintList(&_BankAccountHead, marked, 1, 25);				// PrintList
+
+		printf(GRN"\t\tAccount wurde erfolgreich erstellt"RESET"\n\n");
+		system("pause");
+		system("cls");
+
+		printf("\t 1.) Weiteren Account anlegen\n");
+		printf("\t 2.) Zur%sck zum Men%s\n", "\x81", "\x81");
+
+		scanf("%d", &createNew);
+
+		if (createNew == 2)
 		{
-		case 1:
-			CreateNewAccount();									// Creates a new account
-			break;
-		case 2:
-			PrintList(&_BankAccountHead, marked, 1, 25);		// Print list on terminal
-			break;
-		case 3:
-			PrintList(&_BankAccountHead, marked, 1, -1);
-			RemoveAccount();									// Remove Accounts from heap and file
-			break;
-		case 4:
-			AddDummyData();										// Adding dummy data
-			break;
-		case 5:
-			Sort(&_BankAccountHead, FirstName);					// Sort by Firstname
-			break;
-		case 6:
-			Sort(&_BankAccountHead, LastName);					// Sort by Lastname
-			break;
-		case 7:
-			Sort(&_BankAccountHead, AccountNumber);				// Sort by Accountnumber
-			break;
-		case 8:
-			Sort(&_BankAccountHead, Id);						// Sort by Id
-			break;
-		case 9:
-			CloseApp();											// Close Application
-			return 1;
-			break;
-		default:
-			printf("\nBitte geben waehlen Sie eine Option zwischen 1 und 7\n\n");
-			break;
+			createNew = 0;
+			system("cls");
 		}
 	}
 }
@@ -273,19 +229,19 @@ void LoadBankAccounts()
 	char* buffer = malloc(bufferLength * sizeof(char));
 	char* next_token1 = NULL;
 	char* next_token2 = NULL;
-	int i = 0;
+	int success = 0;
 
 	// Open File (read)
 	accountFile = fopen("accounts.txt", "r");
 
 	if (accountFile != NULL)
 	{
+		_BankAccountHead = NULL;
 		while (fgets(buffer, bufferLength, accountFile))			// Read line by line
 		{
 			BankAccount* newBankAccount = CreateNode();				// Create new BankAccount
 			remove_spaces(buffer);									// Remove whitespace from buffer
 			char* token1 = strtok_s(buffer, ";", &next_token1);		// Separation by ';'
-			i++;
 
 			while (token1 != NULL)
 			{
@@ -321,10 +277,21 @@ void LoadBankAccounts()
 				token1 = strtok_s(NULL, ";", &next_token1);
 			}
 			PushAtTheEnd(&_BankAccountHead, &newBankAccount);
+			success = 1;
+		}
+		if (success)
+		{
+			printf(GRN"\t Daten erfolgreich aus der Datei geladen\n" RESET);
+			system("pause");
+			system("cls");
 		}
 	}
 	else
-		printf(RED"\t\t Datenbank Datei konnte nicht geöffnet werden\n" RESET);
+	{
+		printf(RED"\t Datenbank Datei konnte nicht geöffnet werden\n" RESET);
+		system("pause");
+		system("cls");
+	}
 
 	if (accountFile != NULL)
 		fclose(accountFile);
@@ -333,21 +300,82 @@ void LoadBankAccounts()
 	free(token2);
 }
 
-void Initialize()
+int Menu()
 {
-	LoadBankAccounts();						// Loads data from file, filling heap
+	int choice = 0;
+	int marked[1] = { -1 };
+
+	while (1)
+	{
+		printf(YEL"\n\n\t ------------------------------- \n" RESET);
+		printf(YEL"\t ------- Bank-Verwaltung ------- \n" RESET);
+		printf(YEL"\t ------------------------------- \n\n" RESET);
+		printf("\t 1.) Neue Accounts anlegen\n");
+		printf("\t 2.) Ausgabe auf Terminal\n");
+		printf("\t 3.) Daten l%sschen\n", "\x94");
+		printf("\t 4.) Daten aus Datei laden\n");
+		printf("\t 5.) Daten in Datei speichern\n");
+		printf("\t 6.) Sortieren (Vorname)\n");
+		printf("\t 7.) Sortieren (Nachname)\n");
+		printf("\t 8.) Sortieren (Kontonummer)\n");
+		printf("\t 9.) Sortieren (Id)\n");
+		printf("\t 10.) Hinzuf%sgen von Testdaten\n", "\x81");
+		printf("\t 11.) Bankverwaltung verlassen\n");
+		printf("\n\n\t Auswahl treffen: ");
+
+		scanf("%d", &choice);									// waiting for user input
+		system("cls");											// clears console
+
+		switch (choice)
+		{
+		case 1:
+			CreateNewAccount();									// Creates a new account
+			break;
+		case 2:
+			PrintList(&_BankAccountHead, marked, 1, 25);		// Print list on terminal
+			break;
+		case 3:
+			RemoveAccount();									// Remove Accounts from heap and file
+			break;
+		case 4:
+			LoadBankAccounts();
+			break;
+		case 5:
+			SaveListInFile(&_BankAccountHead);					// Save in List
+			break;
+		case 6:
+			Sort(&_BankAccountHead, FirstName);					// Sort by Firstname
+			break;
+		case 7:
+			Sort(&_BankAccountHead, LastName);					// Sort by Lastname
+			break;
+		case 8:
+			Sort(&_BankAccountHead, AccountNumber);				// Sort by Accountnumber
+			break;
+		case 9:
+			Sort(&_BankAccountHead, Id);						// Sort by Id
+			break;
+		case 10:
+			AddDummyData();										// Adding dummy data
+			break;
+		case 11:
+			CloseApp();											// Close Application
+			return 1;
+		default:
+			printf("\nBitte w%shlen Sie eine Option zwischen 1 und 10\n\n", "\x84");
+			break;
+		}
+	}
 }
 
 int main(int argc, char* argv[])
 {
-	_BankAccountHead = malloc(sizeof(BankAccount));
-	_BankAccountHead->Id = -1;
+	_BankAccountHead = NULL;
 
 	if (argc > 0) { /*read arg1*/ }
 	if (argc > 1) {	/*read arg2*/ }
 
-	Initialize();
-	OpenStartMenu();
+	Menu();
 
 	freeArray(&_BankAccountHead);
 	return 1;

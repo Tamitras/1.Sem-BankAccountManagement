@@ -1,3 +1,6 @@
+#pragma once
+
+// Terminal adjustments
 #define BLK			"\x1B[30m"
 #define RED_BACK    "\x1B[33;41m"
 #define RED			"\x1B[31m"
@@ -47,16 +50,28 @@ typedef struct
 	int Id;
 }BankAccount;
 
-#pragma once
-void HoldTerminal();
-void PrintDatum();
-void freeArray(BankAccount** head);
+// external variables
+extern BankAccount* _BankAccountHead;
+extern FILE* accountFile;
+
+// Global Prototypes
+BankAccount* CreateNode();
+
 int IsNumber(char* string);
 int SeparateThousands(char* text);
-BankAccount* CreateNode();
 int GetAccountNumber(BankAccount** head);
 int GetArrayLength(BankAccount** head);
 int GetNewId();
+
+// Check if int array contains a key
+int containsInIntArray(int* array, int key, int len);
+
+// Check if ListOf BankAccounts contains key
+int contains(int key);
+
+void HoldTerminal();
+void PrintDatum();
+void freeArray(BankAccount** head);
 void AddDummyData();
 void PushAtTheEnd(BankAccount** head, BankAccount** item);
 void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit);
@@ -64,6 +79,4 @@ void remove_spaces(char* s);
 void SaveListInFile(BankAccount** head);
 void Sort(BankAccount** head, SortType type);
 
-// external variables
-extern BankAccount* _BankAccountHead;
-extern FILE* accountFile;
+
