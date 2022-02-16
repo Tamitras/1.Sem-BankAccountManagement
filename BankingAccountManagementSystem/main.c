@@ -38,7 +38,7 @@ void DeleteBankAccount(BankAccount** head, int key)
 	if (temp != NULL && temp->Id == key) {
 		*head = temp->next;		// Changed head
 		(*head)->prev = NULL;	// Set heads prev to null pointer
-		free(temp);				// free old head
+		free(temp);				// Deallocate memory
 		return;
 	}
 
@@ -49,11 +49,11 @@ void DeleteBankAccount(BankAccount** head, int key)
 		temp = temp->next;
 	}
 
-	// If key was not present in linked list
+	// Key not found
 	if (temp == NULL)
 		return;
 
-	// Unlink the node from linked list
+	// Remove account from list
 	prev->next = temp->next;
 	if (((BankAccount*)temp->next) != NULL)
 		((BankAccount*)temp->next)->prev = prev;
@@ -64,7 +64,7 @@ void DeleteBankAccount(BankAccount** head, int key)
 void RemoveAccount()
 {
 	int validDecision = 1;
-	int toDelete[10] = { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
+	int toDelete[10] = { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1 }; // max 10
 	int decision = -1;
 	int exitReading = 0;
 	int marked[1] = { -1 };
@@ -73,7 +73,7 @@ void RemoveAccount()
 
 	PrintList(&_BankAccountHead, marked, 1, -1);
 
-	if (GetArrayLength(&_BankAccountHead) > 0) // Daten zum Löschen vorhanden
+	if (GetArrayLength(&_BankAccountHead) > 0) // Data avaiable for deleting
 	{
 		for (int i = 0; !exitReading; i++)
 		{
@@ -94,7 +94,7 @@ void RemoveAccount()
 			else
 				validDecision = 1;
 
-			if (tempDecision > 0 && containsInIntArray(toDelete, tempDecision, 10)) // still in list (to delete)
+			if (tempDecision > -1 && containsInIntArray(toDelete, tempDecision, 10)) // still in list (to delete)
 			{
 				printf(YEL"\n\t\tDatensatz mit dem Index (%d) wurde bereits zur L%sschen Liste hinzugef%sgt:\n\n" RESET, tempDecision, "\x94", "\x81");
 				i--;
@@ -102,7 +102,7 @@ void RemoveAccount()
 				system("cls");
 				PrintList(&_BankAccountHead, toDelete, i + 1, -1);
 			}
-			else if (tempDecision > 0 && contains(tempDecision))
+			else if (tempDecision > -1 && contains(tempDecision))
 			{
 				toDelete[i] = tempDecision;
 
@@ -153,7 +153,7 @@ void RemoveAccount()
 			{
 				system("cls");
 				PrintList(&_BankAccountHead, marked, 1, -1);
-				printf(YEL"Datensatz mit dem Index (%d) nicht gefunden:\n\n" RESET, toDelete[i]);
+				printf(YEL"Datensatz mit dem Index (%d) nicht gefunden:\n\n" RESET, tempDecision);
 				system("pause");
 			}
 		}

@@ -12,6 +12,16 @@
 #define WHT			"\x1B[37m"
 #define RESET		"\x1B[0m"
 
+// ANSI (8 Bit pro Byte) <-> ASCII (7 Bit pro Byte)
+// Terminal verwendet ASCII, weshalb Umlaute und andere Zeichen nicht funktionieren
+//ä \x84
+//ö \x94
+//ü \x81
+//Ä \x8e
+//Ö \x99
+//Ü \x9a
+//ß \xe1
+
 // Sorting type
 typedef enum {
 	FirstName,
@@ -54,14 +64,17 @@ typedef struct
 extern BankAccount* _BankAccountHead;
 extern FILE* accountFile;
 
-// Global Prototypes
+// Prototypes
 BankAccount* CreateNode();
 
-int IsNumber(char* string);
-int SeparateThousands(char* text);
 int GetAccountNumber(BankAccount** head);
 int GetArrayLength(BankAccount** head);
 int GetNewId();
+void AddDummyData();
+void PushAtTheEnd(BankAccount** head, BankAccount** item);
+void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit);
+void SaveListInFile(BankAccount** head);
+void Sort(BankAccount** head, SortType type);
 
 // Check if int array contains a key
 int containsInIntArray(int* array, int key, int len);
@@ -69,14 +82,5 @@ int containsInIntArray(int* array, int key, int len);
 // Check if ListOf BankAccounts contains key
 int contains(int key);
 
-void HoldTerminal();
-void PrintDatum();
-void freeArray(BankAccount** head);
-void AddDummyData();
-void PushAtTheEnd(BankAccount** head, BankAccount** item);
-void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit);
 void remove_spaces(char* s);
-void SaveListInFile(BankAccount** head);
-void Sort(BankAccount** head, SortType type);
-
-
+void freeArray(BankAccount** head);

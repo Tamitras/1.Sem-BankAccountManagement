@@ -29,121 +29,67 @@ void remove_spaces(char* s)
 	} while (*s++ = *d++);
 }
 
+int containsInIntArray(int* array, int key, int len)
+{
+	for (int i = 0; i < len; i++)
+	{
+		if (key == array[i])
+			return 1;
+	}
+	return 0;
+}
+
+int contains(int key)
+{
+	BankAccount* current = _BankAccountHead;
+
+	if (current != NULL && current->Id >= 0)
+	{
+		for (int i = 1; i < 100000; i++)
+		{
+			while (current)
+			{
+				if (current->Id == key)
+					return 1;
+
+				current = current->next;
+			}
+		}
+	}
+
+	return 0;
+}
+
+/// <summary>
+/// Function to swap pointers
+/// </summary>
+/// <param name="ptr1"></param>
+/// <param name="ptr2"></param>
+/// <returns></returns>
+BankAccount* swap(BankAccount* ptr1, BankAccount* ptr2)
+{
+	// Hilfspointer
+	BankAccount* a = ptr1->prev;
+	BankAccount* b = ptr1;
+	BankAccount* c = ptr2;
+	BankAccount* d = ptr2->next;
+
+	// Swapping
+	if (a)
+		a->next = c;
+	b->prev = c;
+	b->next = d;
+	c->prev = a;
+	c->next = b;
+	if (d)
+		d->prev = b;
+
+	return ptr2;
+}
+
 // Private End
 
 // Public Start
-int IsNumber(char* string)
-{
-	// return 0 --> not a number
-	// return 1 -->  is a number
-	for (int i = 0; i < strlen(string); i++)
-		if (!isdigit(string[i]))
-			return 0;
-	return 1;
-}
-
-void PrintDatum()
-{
-	time_t rawtime;
-	struct tm* info;
-	time(&rawtime);
-	info = localtime(&rawtime);
-
-	printf("\n\nCurrent local time and date: %s", asctime(info));
-}
-
-void HoldTerminal()
-{
-	char s[80];
-	char temp[255];
-	char exit[255];
-
-	strcpy_s(temp, sizeof(temp), "en");
-	strcpy_s(exit, sizeof(exit), "Schlie\xe1");
-
-	strcat_s(exit, sizeof(exit), temp);
-
-	PrintDatum();
-	printf("\n%s mit Enter...", exit);
-	fgets(s, sizeof s, stdin);
-}
-
-int SeparateThousands(char* text)
-{
-	if (!IsNumber(text)) // return zero if not a valid number
-		return 0;
-
-	int s = 0;
-	int length = strlen(text);
-
-	if (length == 3)
-	{
-		printf("!Eingegebene Zahl braucht keine Tausenderpunkte\n");
-		return 0;
-	}
-
-	printf(" Laenge: %d\n", length);
-
-	int number = atoi(text); // char to int
-	char* str = calloc(12, sizeof(char));
-	sprintf(str, "%d", number);
-
-	s = strlen(str) / 3;
-	int rest = strlen(str) % 3;
-	if (rest > 0) // wenn rest
-		s++;
-
-	// ** means multiArray[x][y] 2D
-	char** subStrings = calloc((s + 1), sizeof(unsigned char*));
-	initMultiArray(subStrings, s + 1, 4);
-
-	char* newText = calloc(255, sizeof(char));
-	int nextDigit = 0;
-
-	for (int i = 0; i < s; i++)
-	{
-		char temp[3];
-
-		if (i == 0 && rest > 0)
-		{
-			if (length - (3 * (s - 1)) == 2)
-			{
-				strncpy(temp, &text[0], 2);
-				newText[nextDigit] = temp[0];
-				newText[++nextDigit] = temp[1];
-				newText[++nextDigit] = '.';
-			}
-			else if (length - (3 * (s - 1)) == 1)
-			{
-				strncpy(temp, &text[0], 1);
-				newText[nextDigit] = temp[0];
-				newText[++nextDigit] = '.';
-			}
-		}
-		else
-		{
-			strncpy(temp, &text[length - (s - i) * 3], 3);
-
-			for (int p = 0; p < 3; p++)
-			{
-				if (nextDigit == 0 && p == 0)
-				{
-					newText[nextDigit] = temp[p];
-				}
-				else
-				{
-					newText[++nextDigit] = temp[p];
-				}
-			}
-			newText[++nextDigit] = '.';
-		}
-	}
-
-	if (newText[nextDigit] == '.')
-		newText[nextDigit] = '\n';
-
-	return s;
-}
 
 void SaveListInFile(BankAccount** head)
 {
@@ -186,7 +132,6 @@ void SaveListInFile(BankAccount** head)
 			prevName,
 			nextName);
 
-		//fwrite(_BankAccountHead, sizeof(BankAccount), 1, accountFile);
 		current = current->next;
 	}
 
@@ -254,11 +199,13 @@ int GetNewId()
 
 int GetAccountNumber(BankAccount** head)
 {
+	int accountNumber = 0;
 	BankAccount* current = *head;
-	int accountNumber = current->AccountNumber;
 
 	if (current != NULL && current->Id >= 0)
 	{
+		accountNumber = current->AccountNumber;
+
 		while (current->next != NULL)
 		{
 			current = current->next;
@@ -401,9 +348,7 @@ void AddDummyData()
 	acc10->prev = NULL;
 	PushAtTheEnd(&_BankAccountHead, &acc10);
 
-	// Save in File
-	SaveListInFile(&_BankAccountHead);
-	printf(RED"\t\t Testdaten erstellt\n"RESET);
+	printf(RED"\t\t Testdaten erstellt"RESET);
 }
 
 BankAccount* CreateNode() {
@@ -412,52 +357,21 @@ BankAccount* CreateNode() {
 	return newNode;
 }
 
-/// <summary>
-/// Function to swap pointers
-/// </summary>
-/// <param name="ptr1"></param>
-/// <param name="ptr2"></param>
-/// <returns></returns>
-BankAccount* swap(BankAccount* ptr1, BankAccount* ptr2)
-{
-	// Hilfspointer
-	BankAccount* A = ptr1->prev;
-	BankAccount* B = ptr1;
-	BankAccount* C = ptr2;
-	BankAccount* D = ptr2->next;
-
-	// Swapping
-	if (A)
-		A->next = C;
-	B->prev = C;
-	B->next = D;
-	C->prev = A;
-	C->next = B;
-	if (D)
-		D->prev = B;
-
-	return ptr2;
-}
-
 void Sort(BankAccount** head, SortType type)
 {
+	int i, j, swapped;
 	int marked[1] = { -1 };
 	int count = GetArrayLength(&_BankAccountHead);
-	BankAccount** h;
-	int i, j, swapped;
 	char* sortTypeAsString = malloc(100 * sizeof(char));
+	BankAccount** h;
 
 	if (*head == NULL)
-	{
 		return 0;
-	}
 
 	for (i = 0; i <= count; i++) {
 
 		h = head;
 		swapped = 0;
-
-		strcpy(sortTypeAsString, "");
 
 		for (j = 0; j < count - i - 1; j++) {
 
@@ -517,7 +431,7 @@ void Sort(BankAccount** head, SortType type)
 /// </summary>
 /// <param name="head"></param>
 /// <param name="val"></param>
-void PushAtTheEnd(BankAccount** head, BankAccount** next) 
+void PushAtTheEnd(BankAccount** head, BankAccount** next)
 {
 	if (_BankAccountHead == NULL)
 	{
@@ -544,37 +458,6 @@ void PushAtTheEnd(BankAccount** head, BankAccount** next)
 		(*next)->prev = current;
 		(*next)->next = NULL;
 	}
-}
-
-int containsInIntArray(int* array, int key, int len)
-{
-	for (int i = 0; i < len; i++)
-	{
-		if (key == array[i])
-			return 1;
-	}
-	return 0;
-}
-
-int contains(int key)
-{
-	BankAccount* current = _BankAccountHead;
-
-	if (current != NULL && current->Id >= 0)
-	{
-		for (int i = 1; i < 100000; i++)
-		{
-			while (current)
-			{
-				if (current->Id == key)
-					return 1;
-
-				current = current->next;
-			}
-		}
-	}
-
-	return 0;
 }
 
 void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
