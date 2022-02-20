@@ -16,12 +16,10 @@ void CloseApp(void)
 {
 	system("cls");
 	printf(GRN"\n\n\t\tVielen Dank f%sr Ihren Besuch"RESET"\n\n", "\x81");
-	fflush(stdout);
 
 	for (int i = 5; i != 0; i--)
 	{
-		printf(WHT"\r\t\tSie werden in     "MAG" %d"RESET"     Sekunden automatisch ausgeloggt.", i);
-		fflush(stdout);
+		printf(WHT"\r\t\tSie werden in\t"RED" %d"RESET"\tSekunden automatisch ausgeloggt.", i);
 		Sleep(1000);
 	}
 
@@ -36,9 +34,12 @@ void DeleteBankAccount(BankAccount** head, int key)
 
 	// If head node itself holds the key to be deleted
 	if (temp != NULL && temp->Id == key) {
-		*head = temp->next;		// Changed head
-		(*head)->prev = NULL;	// Set heads prev to null pointer
-		free(temp);				// Deallocate memory
+		*head = temp->next;			// Changed head
+
+		if (temp->next != NULL)		// List is not empty
+			(*head)->prev = NULL;	// Set heads prev to null pointer
+
+		free(temp);					// Deallocate memory
 		return;
 	}
 
@@ -63,13 +64,10 @@ void DeleteBankAccount(BankAccount** head, int key)
 
 void RemoveAccount()
 {
-	int validDecision = 1;
+	int tempDecision = 0, lastDecision = 0, retry = 0, exitReading = 0, validDecision = 1;
 	int toDelete[10] = { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1 }; // max 10
 	int decision = -1;
-	int exitReading = 0;
 	int marked[1] = { -1 };
-	int tempDecision = 0;
-	int retry = 0;
 
 	PrintList(&_BankAccountHead, marked, 1, -1);
 
@@ -94,7 +92,7 @@ void RemoveAccount()
 			else
 				validDecision = 1;
 
-			if (tempDecision > -1 && containsInIntArray(toDelete, tempDecision, 10)) // still in list (to delete)
+			if (lastDecision == 0 && tempDecision > -1 && containsInIntArray(toDelete, tempDecision, 10)) // still in list (to delete)
 			{
 				printf(YEL"\n\t\tDatensatz mit dem Index (%d) wurde bereits zur L%sschen Liste hinzugef%sgt:\n\n" RESET, tempDecision, "\x94", "\x81");
 				i--;
@@ -104,7 +102,10 @@ void RemoveAccount()
 			}
 			else if (tempDecision > -1 && contains(tempDecision))
 			{
-				toDelete[i] = tempDecision;
+				if (tempDecision == lastDecision)
+					lastDecision = 0;
+				else
+					toDelete[i] = tempDecision;
 
 				system("cls");
 				PrintList(&_BankAccountHead, toDelete, i + 1, -1); // mark index
@@ -116,21 +117,25 @@ void RemoveAccount()
 				printf("\t\t(%d) N%schster Datensatz l%sschen  \n\t\t# ", 3, "\x84", "\x94");
 				scanf("%d", &decision);
 
-				if (decision != 3)
+				if (decision != 3)							// next
 				{
-					if (decision == 2)
+					if (decision == 2)						// retry
 					{
 						retry = 1;							// mark as retry
-						toDelete[i] = tempDecision = -1;	// remove last index
+
+						if (i > 0)
+							lastDecision = tempDecision;	// Set lastDecision
+
+						toDelete[i] = -1;					// remove last index
 						i--;
 						system("cls");
 						PrintList(&_BankAccountHead, toDelete, i + 1, -1);
 					}
-					else if (decision == 1)
+					else if (decision == 1)					// delete
 					{
 						exitReading = 1;
 					}
-					else if (decision == 0)
+					else if (decision == 0)					// abort
 					{
 						exitReading = 1;
 						for (int i = 0; i < 5; i++)
@@ -152,18 +157,12 @@ void RemoveAccount()
 			else
 			{
 				system("cls");
-				PrintList(&_BankAccountHead, marked, 1, -1);
+				PrintList(&_BankAccountHead, toDelete, 1, -1);
 				printf(YEL"Datensatz mit dem Index (%d) nicht gefunden:\n\n" RESET, tempDecision);
 				system("pause");
 			}
 		}
 	}
-	else
-	{
-		printf(RED "\n\tEs sind noch keine Daten im Speicher vorhanden, bitte erstellen Sie oder Laden aus der Datei\n\n" RESET);
-		system("pause");
-	}
-
 
 	// Multi-Deleting
 	for (int i = 0; toDelete[i] >= 0; i++)
@@ -196,7 +195,7 @@ void CreateNewAccount(void)
 
 		newBankAccount->FirstName = _strdup(firstName);
 		newBankAccount->LastName = _strdup(lastName);
-		newBankAccount->AccountNumber = GetAccountNumber(&_BankAccountHead);
+		newBankAccount->AccountNumber = GetAccountNumber(_BankAccountHead);
 		newBankAccount->next = NULL;
 		newBankAccount->Id = id;
 		system("cls");
@@ -370,13 +369,16 @@ int Menu()
 
 int main(int argc, char* argv[])
 {
+	// Initialize with NULL
 	_BankAccountHead = NULL;
 
 	if (argc > 0) { /*read arg1*/ }
 	if (argc > 1) {	/*read arg2*/ }
 
+	// BankAccount Menu
 	Menu();
 
-	freeArray(&_BankAccountHead);
+	FreeArray(&_BankAccountHead);
+
 	return 1;
 }

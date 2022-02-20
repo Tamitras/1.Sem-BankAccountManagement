@@ -97,6 +97,7 @@ void SaveListInFile(BankAccount** head)
 
 	if (current == NULL)
 	{
+		// Security Warning - not allowed to overwrite file with an empty list.
 		printf(RED "\n\Fehler! Liste ist leer - Datei kann nicht %sberschrieben werden \n\n" RESET, "\x81");
 		system("pause");
 		system("cls");
@@ -197,10 +198,10 @@ int GetNewId()
 	return -1;
 }
 
-int GetAccountNumber(BankAccount** head)
+int GetAccountNumber(BankAccount* head)
 {
 	int accountNumber = 0;
-	BankAccount* current = *head;
+	BankAccount* current = head;
 
 	if (current != NULL && current->Id >= 0)
 	{
@@ -243,7 +244,7 @@ void AddDummyData()
 	acc1->AccountNumber = "123456";
 	acc1->Adress = "Testwohnort";
 	acc1->LastLogin = "11.02.2022";
-	acc1->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc1->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc1->Id = GetNewId(&_BankAccountHead);
 	acc1->next = NULL;
 	acc1->prev = NULL;
@@ -254,7 +255,7 @@ void AddDummyData()
 	acc2->AccountNumber = "99999";
 	acc2->Adress = "Testwohnort";
 	acc2->LastLogin = "11.02.2022";
-	acc2->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc2->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc2->Id = GetNewId(&_BankAccountHead);
 	acc2->next = NULL;
 	acc2->prev = NULL;
@@ -265,7 +266,7 @@ void AddDummyData()
 	acc3->AccountNumber = "99999";
 	acc3->Adress = "Testwohnort";
 	acc3->LastLogin = "11.02.2022";
-	acc3->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc3->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc3->Id = GetNewId(&_BankAccountHead);
 	acc3->next = NULL;
 	acc3->prev = NULL;
@@ -276,7 +277,7 @@ void AddDummyData()
 	acc4->AccountNumber = "99999";
 	acc4->Adress = "Testwohnort";
 	acc4->LastLogin = "11.02.2022";
-	acc4->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc4->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc4->Id = GetNewId(&_BankAccountHead);
 	acc4->next = NULL;
 	acc4->prev = NULL;
@@ -287,7 +288,7 @@ void AddDummyData()
 	acc5->AccountNumber = "99999";
 	acc5->Adress = "Testwohnort";
 	acc5->LastLogin = "11.02.2022";
-	acc5->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc5->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc5->Id = GetNewId(&_BankAccountHead);
 	acc5->next = NULL;
 	acc5->prev = NULL;
@@ -298,7 +299,7 @@ void AddDummyData()
 	acc6->AccountNumber = "99999";
 	acc6->Adress = "Testwohnort";
 	acc6->LastLogin = "11.02.2022";
-	acc6->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc6->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc6->Id = GetNewId(&_BankAccountHead);
 	acc6->next = NULL;
 	acc6->prev = NULL;
@@ -309,7 +310,7 @@ void AddDummyData()
 	acc7->AccountNumber = "99999";
 	acc7->Adress = "Testwohnort";
 	acc7->LastLogin = "11.02.2022";
-	acc7->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc7->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc7->Id = GetNewId(&_BankAccountHead);
 	acc7->next = NULL;
 	acc7->prev = NULL;
@@ -320,7 +321,7 @@ void AddDummyData()
 	acc8->AccountNumber = "99999";
 	acc8->Adress = "Testwohnort";
 	acc8->LastLogin = "11.02.2022";
-	acc8->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc8->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc8->Id = GetNewId(&_BankAccountHead);
 	acc8->next = NULL;
 	acc8->prev = NULL;
@@ -331,7 +332,7 @@ void AddDummyData()
 	acc9->AccountNumber = "99999";
 	acc9->Adress = "Testwohnort";
 	acc9->LastLogin = "11.02.2022";
-	acc9->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc9->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc9->Id = GetNewId(&_BankAccountHead);
 	acc9->next = NULL;
 	acc9->prev = NULL;
@@ -342,7 +343,7 @@ void AddDummyData()
 	acc10->AccountNumber = "99999";
 	acc10->Adress = "Testwohnort";
 	acc10->LastLogin = "11.02.2022";
-	acc10->AccountNumber = GetAccountNumber(&_BankAccountHead);
+	acc10->AccountNumber = GetAccountNumber(_BankAccountHead);
 	acc10->Id = GetNewId(&_BankAccountHead);
 	acc10->next = NULL;
 	acc10->prev = NULL;
@@ -470,70 +471,79 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
 
 	BankAccount* current = *head;
 
-	while (current != NULL && current->Id > -1)
+	if (GetArrayLength(&_BankAccountHead) > 0) // Data avaiable
 	{
-		BankAccount* prev = current->prev;
-		BankAccount* next = current->next;
-
-		if (prev)
-			prevName = _strdup(prev->FirstName);
-		else
-			prevName = _strdup("NULL(void*)");
-
-		if (next)
-			nextName = _strdup(next->FirstName);
-		else
-			nextName = _strdup("NULL(void*)");
-
-		if (containsInIntArray(toDelete, current->Id, arrayLen) > 0)
+		while (current != NULL && current->Id > -1)
 		{
-			snprintf(result,
-				1024,
-				" (%d)\tVorname: %-15s"
-				" Nachname: %-15s"
-				" KontoNummer: %-15d"
-				" Davor: %-15s"
-				" Danach: %-15s",
-				current->Id,
-				current->FirstName,
-				current->LastName,
-				current->AccountNumber,
-				prevName,
-				nextName);
-			printf(RED"%s\n"RESET, result);
-		}
-		else
-		{
-			snprintf(result,
-				1024,
-				YEL" (%d)"RESET
-				CYN"\tVorname: "RESET
-				"%-15s"BLK";"RESET
-				CYN"Nachname: "RESET
-				"%-15s"BLK";"RESET
-				CYN"KontoNummer: "RESET
-				"%-15d"BLK";"RESET
-				CYN"Davor: "RESET
-				"%-15s"BLK";"RESET
-				CYN"Danach: "RESET
-				"%-15s",
-				current->Id,
-				current->FirstName,
-				current->LastName,
-				current->AccountNumber,
-				prevName,
-				nextName);
-			printf("%s\n", result);
-		}
+			BankAccount* prev = current->prev;
+			BankAccount* next = current->next;
 
-		limitCounter++;
+			if (prev)
+				prevName = _strdup(prev->FirstName);
+			else
+				prevName = _strdup("NULL(void*)");
 
-		if (limit > 0 && limitCounter == limit)
-		{
-			system("pause");
-			limitCounter = 0;
+			if (next)
+				nextName = _strdup(next->FirstName);
+			else
+				nextName = _strdup("NULL(void*)");
+
+			if (containsInIntArray(toDelete, current->Id, arrayLen) > 0)
+			{
+				snprintf(result,
+					1024,
+					" (%d)\tVorname: %-15s"
+					" Nachname: %-15s"
+					" KontoNummer: %-15d"
+					" Davor: %-15s"
+					" Danach: %-15s",
+					current->Id,
+					current->FirstName,
+					current->LastName,
+					current->AccountNumber,
+					prevName,
+					nextName);
+				printf(RED"%s\n"RESET, result);
+			}
+			else
+			{
+				snprintf(result,
+					1024,
+					YEL" (%d)"RESET
+					CYN"\tVorname: "RESET
+					"%-15s"BLK";"RESET
+					CYN"Nachname: "RESET
+					"%-15s"BLK";"RESET
+					CYN"KontoNummer: "RESET
+					"%-15d"BLK";"RESET
+					CYN"Davor: "RESET
+					"%-15s"BLK";"RESET
+					CYN"Danach: "RESET
+					"%-15s",
+					current->Id,
+					current->FirstName,
+					current->LastName,
+					current->AccountNumber,
+					prevName,
+					nextName);
+				printf("%s\n", result);
+			}
+
+			limitCounter++;
+
+			if (limit > 0 && limitCounter == limit)
+			{
+				system("pause");
+				limitCounter = 0;
+			}
+			current = current->next;
 		}
-		current = current->next;
+	}
+	else
+	{
+		printf(RED "\n\tEs sind noch keine Daten im Speicher vorhanden, bitte erstellen Sie oder Laden aus der Datei\n\n" RESET);
+		system("pause");
+		system("cls");
 	}
 
 	//printf("\n\n");
@@ -541,7 +551,7 @@ void PrintList(BankAccount** head, int* toDelete, int arrayLen, int limit)
 	free(temp);
 }
 
-void freeArray(BankAccount** head)
+void FreeArray(BankAccount** head)
 {
 	BankAccount* current = *head;
 	BankAccount* temp = NULL;

@@ -67,7 +67,8 @@ extern FILE* accountFile;
 // Prototypes
 BankAccount* CreateNode();
 
-int GetAccountNumber(BankAccount** head);
+int GetAccountNumber(BankAccount* head);
+
 int GetArrayLength(BankAccount** head);
 int GetNewId();
 void AddDummyData();
@@ -83,4 +84,4 @@ int containsInIntArray(int* array, int key, int len);
 int contains(int key);
 
 void remove_spaces(char* s);
-void freeArray(BankAccount** head);
+void FreeArray(BankAccount** head);
